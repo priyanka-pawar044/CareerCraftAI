@@ -4,33 +4,37 @@
 
 @layer base {
   :root {
-    --background: 274 100% 97%;
-    --foreground: 278 10% 20%;
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
     --card: 0 0% 100%;
-    --card-foreground: 278 10% 20%;
+    --card-foreground: 222.2 84% 4.9%;
+ 
     --popover: 0 0% 100%;
-    --popover-foreground: 278 10% 20%;
-    --primary: 278 69% 61%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 276 80% 92%;
-    --secondary-foreground: 278 10% 20%;
-    --muted: 276 80% 92%;
-    --muted-foreground: 278 10% 40%;
-    --accent: 350 79% 61%;
-    --accent-foreground: 0 0% 98%;
+    --popover-foreground: 222.2 84% 4.9%;
+ 
+    --primary: 252 80% 60%; /* Lavender */
+    --primary-foreground: 0 0% 100%;
+ 
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+ 
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+ 
+    --accent: 252 80% 95%; /* Lighter Lavender */
+    --accent-foreground: 222.2 47.4% 11.2%;
+ 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 278 20% 85%;
-    --input: 0 0% 100%;
-    --ring: 278 69% 61%;
-    --chart-1: 278 69% 61%;
-    --chart-2: 350 79% 61%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 252 80% 60%;
+ 
     --radius: 0.5rem;
 
-    /* Sidebar Theme */
+     /* Sidebar Theme */
     --sidebar-background: 278 50% 99%;
     --sidebar-foreground: 278 10% 20%;
     --sidebar-primary: 278 69% 61%;
@@ -40,27 +44,36 @@
     --sidebar-border: 278 20% 88%;
     --sidebar-ring: 278 69% 61%;
   }
+ 
   .dark {
-    --background: 278 10% 10%;
+    --background: 222.2 84% 4.9%;
     --foreground: 0 0% 98%;
-    --card: 278 10% 15%;
+ 
+    --card: 222.2 84% 4.9%;
     --card-foreground: 0 0% 98%;
-    --popover: 278 10% 10%;
+ 
+    --popover: 222.2 84% 4.9%;
     --popover-foreground: 0 0% 98%;
-    --primary: 278 69% 61%;
+ 
+    --primary: 252 80% 60%;
     --primary-foreground: 0 0% 98%;
-    --secondary: 278 10% 20%;
+ 
+    --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;
-    --muted: 278 10% 20%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 350 79% 61%;
+ 
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+ 
+    --accent: 240 3.7% 15.9%;
     --accent-foreground: 0 0% 98%;
+ 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 278 10% 25%;
-    --input: 278 10% 15%;
-    --ring: 278 69% 61%;
-    
+ 
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 252 80% 60%;
+
     /* Sidebar Theme Dark */
     --sidebar-background: 278 10% 12%;
     --sidebar-foreground: 0 0% 98%;
@@ -72,7 +85,7 @@
     --sidebar-ring: 278 69% 61%;
   }
 }
-
+ 
 @layer base {
   * {
     @apply border-border;
