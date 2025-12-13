@@ -1,42 +1,36 @@
-rules_version = '2';
-
 /**
- * This ruleset enforces a strict user-ownership security model for the
- * CareerPilot AI platform. All user-generated data is stored within a
- * dedicated user-specific document tree, ensuring that users can only access
- * their own information.
+ * Core Philosophy: This ruleset enforces a strict user-ownership model. All user-generated
+ * content is stored in subcollections under that user's unique ID (`/users/{userId}`).
+ * Access is granted only to the authenticated user whose UID matches the `{userId}` in the path.
+ * This prevents any user from accessing another user's private data.
  *
- * Core Philosophy:
- * The security model is centered on data privacy and isolation. A user's
- * data, including resumes, interview sessions, and various analyses, is
- * strictly confined to their own document hierarchy. Access is granted only
- * to the authenticated user whose UID matches the `userId` in the document path.
- *
- * Data Structure:
- * All data is nested under the `/users/{userId}` collection path. This
- * hierarchical structure makes ownership explicit and allows for simple,
- * performant security rules that leverage the document path for authorization
- * checks. For example, a user's resumes are stored at
- * `/users/{userId}/resumes/{resumeId}`.
+ * Data Structure: All data is hierarchically organized under a top-level `users` collection.
+ * For example, a user's resumes are stored at `/users/{userId}/resumes/{resumeId}`. This
+ * structure makes ownership-based security rules simple and performant.
  *
  * Key Security Decisions:
- * - Strict Ownership: All operations (read, write, delete) are restricted to the
- *   document owner, enforced by checking `request.auth.uid`.
- * - No Public Listing: Listing users from the top-level `/users` collection
- *   is explicitly disallowed to protect user privacy.
- * - Denormalization for Authorization: Subcollections like `resumes` and
- *   `interviewSessions` store a `userId` field. This is validated on write
- *   operations to ensure relational integrity between the document's content
- *   and its location in the database.
- * - Nested Authorization: For deeply nested collections like `analysis` or
- *   `answers`, access is granted by checking the ownership of the parent
- *   document (e.g., the `Resume` or `InterviewSession`) using a `get()` call.
- *   This maintains the chain of ownership securely.
+ * - User Isolation: Users can only read and write data within their own document tree.
+ * - No User Listing: Listing all documents in the top-level `/users` collection is disallowed
+ *   to protect user privacy.
+ * - No Client-Side Account Deletion: Users cannot delete their own root `/users/{userId}` document
+ *   from the client. This type of destructive action should be handled by a trusted backend process.
+ * - Default Deny: All operations are denied by default unless explicitly permitted by a rule.
+ *
+ * Denormalization for Authorization: To ensure fast and secure access checks, data documents
+ * (like Resumes, InterviewSessions, etc.) are expected to contain a denormalized `userId` field.
+ * This allows rules to validate document ownership on write operations without performing costly
+ * lookups to parent documents. For example, a new Resume document must have a `userId` field that
+ * matches the authenticated user's UID.
+ *
+ * Structural Segregation: The entire data model is segregated by user ID at the root level
+ * (`/users/{userId}`). This is the most secure and performant way to manage private user data,
+ * as it allows for efficient ownership-based rules for all list, get, and write operations.
  */
+rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper Functions for Reusability and Clarity
+    // Helper functions to promote readable, secure, and maintainable rules.
 
     /**
      * Checks if a user is authenticated.
@@ -46,8 +40,7 @@ service cloud.firestore {
     }
 
     /**
-     * Checks if the currently authenticated user is the owner of the resource.
-     * Compares the request's auth UID with the userId from the path.
+     * Validates if the currently authenticated user is the owner of the document path.
      * @param userId The user ID from the document path.
      */
     function isOwner(userId) {
@@ -55,8 +48,7 @@ service cloud.firestore {
     }
 
     /**
-     * Verifies ownership for an existing document. Used for update/delete.
-     * Ensures the document exists before checking ownership.
+     * Validates ownership for an existing document. Used for update and delete operations.
      * @param userId The user ID from the document path.
      */
     function isExistingOwner(userId) {
@@ -64,141 +56,138 @@ service cloud.firestore {
     }
 
     /**
-     * Validates that the incoming `userId` field matches the user's auth UID.
-     * Used on create to enforce relational integrity.
+     * Validates that the ID field within a User document matches the document's ID in the path.
+     * This ensures relational integrity on creation.
      */
-    function incomingDataIsOwnedBy(userId) {
-      return request.resource.data.userId == userId;
+    function isCreatingOwnProfile(userId) {
+      return isOwner(userId) && request.resource.data.id == userId;
     }
 
     /**
-     * Validates that the `userId` field is immutable on updates.
+     * Enforces immutability of the ID field within a User document during updates.
      */
-    function ownerFieldIsUnchanged() {
+    function isUpdatingOwnProfile() {
+      return request.resource.data.id == resource.data.id;
+    }
+
+    /**
+     * Validates that the 'userId' field within a new subcollection document matches the owner's UID.
+     * This ensures the denormalized ownership link is set correctly on creation.
+     */
+    function isCreatingOwnContent(userId) {
+      return isOwner(userId) && request.resource.data.userId == userId;
+    }
+
+    /**
+     * Enforces immutability of the 'userId' field on existing documents during updates.
+     */
+    function isUpdatingOwnContent() {
       return request.resource.data.userId == resource.data.userId;
     }
 
     /**
-     * Checks if the user owns the parent Resume document for a nested analysis.
-     * This is crucial for securing sub-sub-collections.
-     */
-    function isParentResumeOwner(userId, resumeId) {
-      let resumePath = /databases/$(database)/documents/users/$(userId)/resumes/$(resumeId);
-      return isOwner(userId) && get(resumePath).data.userId == userId;
-    }
-
-    /**
-     * Checks if the user owns the parent InterviewSession document for a nested answer.
-     * This is crucial for securing sub-sub-collections.
-     */
-    function isParentSessionOwner(userId, interviewSessionId) {
-      let sessionPath = /databases/$(database)/documents/users/$(userId)/interviewSessions/$(interviewSessionId);
-      return isOwner(userId) && get(sessionPath).data.userId == userId;
-    }
-
-    /**
-     * @description Manages user profile documents.
+     * @description Rules for the User document.
      * @path /users/{userId}
-     * @allow (create) An authenticated user can create their own user profile document.
-     * @deny (get) A user cannot read another user's profile.
-     * @principle Restricts access to a user's own data tree and allows self-creation of a profile.
+     * @allow (create) A new user creating their own user profile document.
+     * @deny (list) A user trying to list all other users in the system.
+     * @principle A user has exclusive control over their own profile document, but cannot delete it from the client.
      */
     match /users/{userId} {
       allow get: if isOwner(userId);
       allow list: if false;
-      allow create: if isOwner(userId) && request.resource.data.id == userId;
-      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
-      allow delete: if isExistingOwner(userId);
-    }
+      allow create: if isCreatingOwnProfile(userId);
+      allow update: if isExistingOwner(userId) && isUpdatingOwnProfile();
+      allow delete: if false;
 
-    /**
-     * @description Manages a user's private resume documents.
-     * @path /users/{userId}/resumes/{resumeId}
-     * @allow (create) An authenticated user can create a resume document under their own profile.
-     * @deny (list) A user cannot list resumes belonging to another user.
-     * @principle Enforces document ownership and validates relational integrity via the 'userId' field.
-     */
-    match /users/{userId}/resumes/{resumeId} {
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
-      allow create: if isOwner(userId) && incomingDataIsOwnedBy(userId);
-      allow update: if isExistingOwner(userId) && ownerFieldIsUnchanged();
-      allow delete: if isExistingOwner(userId);
-    }
+      /**
+       * @description Rules for a user's Resume documents.
+       * @path /users/{userId}/resumes/{resumeId}
+       * @allow (create) An authenticated user creating a resume under their own user ID.
+       * @deny (get) An authenticated user trying to read another user's resume.
+       * @principle Enforces that a user can only manage resumes within their own data tree.
+       */
+      match /resumes/{resumeId} {
+        allow get: if isOwner(userId);
+        allow list: if isOwner(userId);
+        allow create: if isCreatingOwnContent(userId);
+        allow update: if isExistingOwner(userId) && isUpdatingOwnContent();
+        allow delete: if isExistingOwner(userId);
 
-    /**
-     * @description Secures the analysis results for a specific resume.
-     * @path /users/{userId}/resumes/{resumeId}/analysis/{analysisId}
-     * @allow (get) The owner of the parent resume can read its analysis.
-     * @deny (get) A user cannot read the analysis for a resume they do not own.
-     * @principle Secures a nested subcollection by verifying ownership of the parent document.
-     */
-    match /users/{userId}/resumes/{resumeId}/analysis/{analysisId} {
-      allow get: if isParentResumeOwner(userId, resumeId);
-      allow list: if isParentResumeOwner(userId, resumeId);
-      allow create: if isParentResumeOwner(userId, resumeId);
-      allow update: if isParentResumeOwner(userId, resumeId) && resource != null;
-      allow delete: if isParentResumeOwner(userId, resumeId) && resource != null;
-    }
+        /**
+         * @description Rules for analyses of a specific resume.
+         * @path /users/{userId}/resumes/{resumeId}/analyses/{analysisId}
+         * @allow (list) A user listing all analyses for one of their resumes.
+         * @deny (create) A user trying to create an analysis for another user's resume.
+         * @principle Restricts access to a user's own data tree via path-based security.
+         */
+        match /analyses/{analysisId} {
+          allow get: if isOwner(userId);
+          allow list: if isOwner(userId);
+          allow create: if isOwner(userId);
+          allow update: if isExistingOwner(userId);
+          allow delete: if isExistingOwner(userId);
+        }
+      }
 
-    /**
-     * @description Manages a user's private interview session documents.
-     * @path /users/{userId}/interviewSessions/{interviewSessionId}
-     * @allow (create) An authenticated user can create an interview session under their own profile.
-     * @deny (update) A user cannot update an interview session belonging to another user.
-     * @principle Enforces document ownership and validates relational integrity via the 'userId' field.
-     */
-    match /users/{userId}/interviewSessions/{interviewSessionId} {
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
-      allow create: if isOwner(userId) && incomingDataIsOwnedBy(userId);
-      allow update: if isExistingOwner(userId) && ownerFieldIsUnchanged();
-      allow delete: if isExistingOwner(userId);
-    }
+      /**
+       * @description Rules for a user's mock interview sessions.
+       * @path /users/{userId}/interview_sessions/{sessionId}
+       * @allow (create) An authenticated user starting a new interview session.
+       * @deny (update) An authenticated user trying to modify another user's session.
+       * @principle Enforces document ownership for writes and path ownership for reads.
+       */
+      match /interview_sessions/{sessionId} {
+        allow get: if isOwner(userId);
+        allow list: if isOwner(userId);
+        allow create: if isCreatingOwnContent(userId);
+        allow update: if isExistingOwner(userId) && isUpdatingOwnContent();
+        allow delete: if isExistingOwner(userId);
 
-    /**
-     * @description Secures the answers for a specific interview session.
-     * @path /users/{userId}/interviewSessions/{interviewSessionId}/answers/{answerId}
-     * @allow (get) The owner of the parent interview session can read its answers.
-     * @deny (get) A user cannot read answers for an interview they do not own.
-     * @principle Secures a nested subcollection by verifying ownership of the parent document.
-     */
-    match /users/{userId}/interviewSessions/{interviewSessionId}/answers/{answerId} {
-      allow get: if isParentSessionOwner(userId, interviewSessionId);
-      allow list: if isParentSessionOwner(userId, interviewSessionId);
-      allow create: if isParentSessionOwner(userId, interviewSessionId);
-      allow update: if isParentSessionOwner(userId, interviewSessionId) && resource != null;
-      allow delete: if isParentSessionOwner(userId, interviewSessionId) && resource != null;
-    }
+        /**
+         * @description Rules for answers within a specific interview session.
+         * @path /users/{userId}/interview_sessions/{sessionId}/answers/{answerId}
+         * @allow (get) A user retrieving a specific answer from one of their past sessions.
+         * @deny (list) A user trying to list answers from another user's session.
+         * @principle Restricts access to a user's own data tree via path-based security.
+         */
+        match /answers/{answerId} {
+          allow get: if isOwner(userId);
+          allow list: if isOwner(userId);
+          allow create: if isOwner(userId);
+          allow update: if isExistingOwner(userId);
+          allow delete: if isExistingOwner(userId);
+        }
+      }
 
-    /**
-     * @description Manages a user's private skill gap analysis documents.
-     * @path /users/{userId}/skillGapAnalyses/{analysisId}
-     * @allow (create) An authenticated user can create a skill gap analysis under their own profile.
-     * @deny (delete) A user cannot delete an analysis belonging to another user.
-     * @principle Enforces document ownership and validates relational integrity via the 'userId' field.
-     */
-    match /users/{userId}/skillGapAnalyses/{analysisId} {
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
-      allow create: if isOwner(userId) && incomingDataIsOwnedBy(userId);
-      allow update: if isExistingOwner(userId) && ownerFieldIsUnchanged();
-      allow delete: if isExistingOwner(userId);
-    }
+      /**
+       * @description Rules for a user's skill-gap analysis documents.
+       * @path /users/{userId}/skill_gap_analyses/{analysisId}
+       * @allow (create) An authenticated user creating a skill-gap analysis for themselves.
+       * @deny (delete) An authenticated user trying to delete another user's analysis.
+       * @principle Enforces that a user can only manage analyses within their own data tree.
+       */
+      match /skill_gap_analyses/{analysisId} {
+        allow get: if isOwner(userId);
+        allow list: if isOwner(userId);
+        allow create: if isCreatingOwnContent(userId);
+        allow update: if isExistingOwner(userId) && isUpdatingOwnContent();
+        allow delete: if isExistingOwner(userId);
+      }
 
-    /**
-     * @description Manages a user's private job description analysis documents.
-     * @path /users/{userId}/jobDescriptionAnalyses/{analysisId}
-     * @allow (create) An authenticated user can create a job description analysis under their own profile.
-     * @deny (get) A user cannot read an analysis belonging to another user.
-     * @principle Enforces document ownership and validates relational integrity via the 'userId' field.
-     */
-    match /users/{userId}/jobDescriptionAnalyses/{analysisId} {
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
-      allow create: if isOwner(userId) && incomingDataIsOwnedBy(userId);
-      allow update: if isExistingOwner(userId) && ownerFieldIsUnchanged();
-      allow delete: if isExistingOwner(userId);
+      /**
+       * @description Rules for a user's job description analysis documents.
+       * @path /users/{userId}/job_description_analyses/{analysisId}
+       * @allow (list) A user listing all of their past job description analyses.
+       * @deny (get) A user trying to read another user's job description analysis.
+       * @principle Enforces that a user can only manage analyses within their own data tree.
+       */
+      match /job_description_analyses/{analysisId} {
+        allow get: if isOwner(userId);
+        allow list: if isOwner(userId);
+        allow create: if isCreatingOwnContent(userId);
+        allow update: if isExistingOwner(userId) && isUpdatingOwnContent();
+        allow delete: if isExistingOwner(userId);
+      }
     }
   }
 }
