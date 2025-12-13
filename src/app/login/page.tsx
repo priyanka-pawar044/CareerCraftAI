@@ -41,6 +41,18 @@ const tools = [
   { name: 'DigitalOcean', logo: '/tech-logos/digitalocean.svg' },
   { name: 'Oracle Cloud', logo: '/tech-logos/oracle.svg' },
   { name: 'IBM Cloud', logo: '/tech-logos/ibm-cloud.svg' },
+  // Infrastructure as Code & Configuration
+  { name: 'Terraform', logo: '/tech-logos/terraform.svg' },
+  { name: 'Ansible', logo: '/tech-logos/ansible.svg' },
+  { name: 'Chef', logo: '/tech-logos/chef.svg' },
+  { name: 'Puppet', logo: '/tech-logos/puppet.svg' },
+  // Operating Systems
+  { name: 'Linux', logo: '/tech-logos/linux.svg' },
+  { name: 'Ubuntu', logo: '/tech-logos/ubuntu.svg' },
+  { name: 'Red Hat', logo: '/tech-logos/redhat.svg' },
+  { name: 'SUSE', logo: '/tech-logos/suse.svg' },
+  { name: 'CentOS', logo: '/tech-logos/centos.svg' },
+  { name: 'Windows Server', logo: '/tech-logos/windows-server.svg' },
 ];
 
 
