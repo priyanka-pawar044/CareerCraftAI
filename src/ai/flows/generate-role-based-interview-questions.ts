@@ -37,7 +37,7 @@ const prompt = ai.definePrompt({
   Generate a mix of technical and HR-related interview questions for the following job role:
   {{jobRole}}
 
-  Provide the questions as a numbered list.
+  Return the questions in a JSON object with a "questions" array.
   `,
 });
 
@@ -48,15 +48,7 @@ const generateRoleBasedInterviewQuestionsFlow = ai.defineFlow(
     outputSchema: GenerateRoleBasedInterviewQuestionsOutputSchema,
   },
   async input => {
-    const {text} = await ai.generate({
-      prompt: `You are an AI assistant designed to generate interview questions for job seekers.
-
-      Generate a mix of technical and HR-related interview questions for the following job role:
-      ${input.jobRole}
-
-      Provide the questions as a numbered list.`, //using ai.generate instead of prompt object because output is just text
-    });
-    const questions = text!.split('\n').filter(question => question.trim() !== '');
-    return {questions};
+    const {output} = await prompt(input);
+    return output!;
   }
 );
