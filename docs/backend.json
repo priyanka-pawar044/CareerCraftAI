@@ -1,0 +1,438 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user of the CareerPilot AI platform.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the User entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The user's full name."
+        },
+        "email": {
+          "type": "string",
+          "description": "The user's email address.",
+          "format": "email"
+        },
+        "authProvider": {
+          "type": "string",
+          "description": "The authentication provider used by the user (e.g., Google, GitHub)."
+        },
+        "lastLogin": {
+          "type": "string",
+          "description": "Timestamp of the user's last login.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "email",
+        "authProvider"
+      ]
+    },
+    "Resume": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Resume",
+      "type": "object",
+      "description": "Represents a user's resume.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Resume entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N Resume)"
+        },
+        "uploadDate": {
+          "type": "string",
+          "description": "Date when the resume was uploaded.",
+          "format": "date-time"
+        },
+        "fileType": {
+          "type": "string",
+          "description": "The file type of the resume (e.g., PDF)."
+        },
+        "content": {
+          "type": "string",
+          "description": "The text content of the resume."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "uploadDate",
+        "fileType",
+        "content"
+      ]
+    },
+    "ResumeAnalysis": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ResumeAnalysis",
+      "type": "object",
+      "description": "Represents the analysis results for a resume.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the ResumeAnalysis entity."
+        },
+        "resumeId": {
+          "type": "string",
+          "description": "Reference to Resume. (Relationship: Resume 1:1 ResumeAnalysis)"
+        },
+        "atsScore": {
+          "type": "number",
+          "description": "The ATS score of the resume (0-100)."
+        },
+        "improvementSuggestions": {
+          "type": "string",
+          "description": "AI-generated suggestions for improving the resume."
+        },
+        "analysisDate": {
+          "type": "string",
+          "description": "The timestamp of when the resume analysis was performed.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "resumeId",
+        "atsScore",
+        "improvementSuggestions",
+        "analysisDate"
+      ]
+    },
+    "InterviewSession": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "InterviewSession",
+      "type": "object",
+      "description": "Represents a mock interview session.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the InterviewSession entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N InterviewSession)"
+        },
+        "jobRole": {
+          "type": "string",
+          "description": "The job role selected for the interview."
+        },
+        "sessionDate": {
+          "type": "string",
+          "description": "The timestamp of when the interview session was conducted.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "jobRole",
+        "sessionDate"
+      ]
+    },
+    "InterviewAnswer": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "InterviewAnswer",
+      "type": "object",
+      "description": "Represents a user's answer to an interview question and the AI's evaluation.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the InterviewAnswer entity."
+        },
+        "interviewSessionId": {
+          "type": "string",
+          "description": "Reference to InterviewSession. (Relationship: InterviewSession 1:N InterviewAnswer)"
+        },
+        "question": {
+          "type": "string",
+          "description": "The interview question asked."
+        },
+        "answer": {
+          "type": "string",
+          "description": "The user's answer to the question."
+        },
+        "correctnessScore": {
+          "type": "number",
+          "description": "AI's evaluation of the correctness of the answer."
+        },
+        "clarityScore": {
+          "type": "number",
+          "description": "AI's evaluation of the clarity of the answer."
+        },
+        "confidenceScore": {
+          "type": "number",
+          "description": "AI's evaluation of the confidence in the answer."
+        },
+        "modelAnswer": {
+          "type": "string",
+          "description": "AI's model answer for the question."
+        },
+        "improvementSuggestions": {
+          "type": "string",
+          "description": "AI's suggestions for improving the answer."
+        }
+      },
+      "required": [
+        "id",
+        "interviewSessionId",
+        "question",
+        "answer",
+        "correctnessScore",
+        "clarityScore",
+        "confidenceScore"
+      ]
+    },
+    "SkillGapAnalysis": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "SkillGapAnalysis",
+      "type": "object",
+      "description": "Represents the result of a skill-gap analysis between a user's skills and a job role.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the SkillGapAnalysis entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N SkillGapAnalysis)"
+        },
+        "missingSkills": {
+          "type": "string",
+          "description": "Skills identified as missing based on the analysis."
+        },
+        "learningRoadmap": {
+          "type": "string",
+          "description": "Personalized learning roadmap to address the skill gaps."
+        },
+        "analysisDate": {
+          "type": "string",
+          "description": "The timestamp of when the skill-gap analysis was performed.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "missingSkills",
+        "learningRoadmap",
+        "analysisDate"
+      ]
+    },
+    "JobDescriptionAnalysis": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "JobDescriptionAnalysis",
+      "type": "object",
+      "description": "Represents the analysis results for a job description.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the JobDescriptionAnalysis entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N JobDescriptionAnalysis)"
+        },
+        "jobDescriptionText": {
+          "type": "string",
+          "description": "The pasted job description text."
+        },
+        "requiredSkills": {
+          "type": "string",
+          "description": "Skills extracted from the job description."
+        },
+        "experienceLevel": {
+          "type": "string",
+          "description": "The experience level extracted from the job description."
+        },
+        "missingKeywords": {
+          "type": "string",
+          "description": "Keywords missing from the user's resume compared to the job description."
+        },
+        "matchPercentage": {
+          "type": "number",
+          "description": "The percentage of how well the user's resume matches the job description."
+        },
+        "analysisDate": {
+          "type": "string",
+          "description": "The timestamp of when the job description analysis was performed.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "jobDescriptionText",
+        "requiredSkills",
+        "experienceLevel",
+        "missingKeywords",
+        "matchPercentage",
+        "analysisDate"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profiles. Each document represents a user. Only the user themselves can read/write their own document.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user, corresponding to their Firebase Auth UID."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/resumes/{resumeId}",
+        "definition": {
+          "entityName": "Resume",
+          "schema": {
+            "$ref": "#/backend/entities/Resume"
+          },
+          "description": "Stores resumes for a specific user. Includes denormalized 'userId' for authorization independence. Only the user can read/write their resumes.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "resumeId",
+              "description": "The unique identifier for the resume."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/resumes/{resumeId}/analysis/{analysisId}",
+        "definition": {
+          "entityName": "ResumeAnalysis",
+          "schema": {
+            "$ref": "#/backend/entities/ResumeAnalysis"
+          },
+          "description": "Stores analysis results for a specific resume. Includes denormalized 'userId' and 'resumeId' for authorization independence. Only the user can read/write their resume analyses.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "resumeId",
+              "description": "The unique identifier for the resume."
+            },
+            {
+              "name": "analysisId",
+              "description": "The unique identifier for the resume analysis."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/interviewSessions/{interviewSessionId}",
+        "definition": {
+          "entityName": "InterviewSession",
+          "schema": {
+            "$ref": "#/backend/entities/InterviewSession"
+          },
+          "description": "Stores interview sessions for a specific user. Includes denormalized 'userId' for authorization independence. Only the user can read/write their interview sessions.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "interviewSessionId",
+              "description": "The unique identifier for the interview session."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/interviewSessions/{interviewSessionId}/answers/{answerId}",
+        "definition": {
+          "entityName": "InterviewAnswer",
+          "schema": {
+            "$ref": "#/backend/entities/InterviewAnswer"
+          },
+          "description": "Stores interview answers for a specific interview session. Includes denormalized 'userId' and 'interviewSessionId' for authorization independence. Only the user can read/write their interview answers.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "interviewSessionId",
+              "description": "The unique identifier for the interview session."
+            },
+            {
+              "name": "answerId",
+              "description": "The unique identifier for the interview answer."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/skillGapAnalyses/{analysisId}",
+        "definition": {
+          "entityName": "SkillGapAnalysis",
+          "schema": {
+            "$ref": "#/backend/entities/SkillGapAnalysis"
+          },
+          "description": "Stores skill-gap analyses for a specific user. Includes denormalized 'userId' for authorization independence. Only the user can read/write their skill gap analyses.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "analysisId",
+              "description": "The unique identifier for the skill gap analysis."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/jobDescriptionAnalyses/{analysisId}",
+        "definition": {
+          "entityName": "JobDescriptionAnalysis",
+          "schema": {
+            "$ref": "#/backend/entities/JobDescriptionAnalysis"
+          },
+          "description": "Stores job description analyses for a specific user. Includes denormalized 'userId' for authorization independence. Only the user can read/write their job description analyses.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "analysisId",
+              "description": "The unique identifier for the job description analysis."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to ensure authorization independence, clarity, and scalability. User-owned data is nested under the `/users/{userId}` path, ensuring clear ownership and simplifying security rules. For collaborative data models, membership maps are used and denormalized when needed. The structure avoids `get()` calls in security rules by denormalizing authorization data, thus enabling atomic operations and improving performance.\n\n*   **Authorization Independence:** Each subcollection under `/users/{userId}` (resumes, interviewSessions, etc.) inherits authorization context via the path. This eliminates the need for `get()` calls to parent documents, making security rules more efficient and robust.\n*   **Clarity of Intent:** The hierarchical structure clearly represents the relationships between entities. For example, resumes belonging to a user are directly located under the user's document.\n*   **QAPs (Rules are not Filters):** Secure `list` operations are enabled by the path-based ownership model. Listing resumes under `/users/{userId}/resumes` is inherently secure, as it only returns resumes owned by that user.\n*   **Homogeneous Security Posture:** Each collection contains documents with similar security needs. For instance, the `users` collection only contains user profiles, all of which have the same access requirements.\n*   **Invariants:** Ownership is enforced by the hierarchical path structure. Timestamps are included in entities like Resumes and InterviewSessions to track history, and denormalized data (like `userId` in subcollections) ensures data integrity."
+  }
+}
