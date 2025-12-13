@@ -55,10 +55,10 @@ export function AppSidebar() {
                   isActive={pathname === item.href}
                   tooltip={item.label}
                 >
-                  <span>
+                  <>
                     <item.icon />
                     <span>{item.label}</span>
-                  </span>
+                  </>
                 </SidebarMenuButton>
               </Link>
             </SidebarMenuItem>
