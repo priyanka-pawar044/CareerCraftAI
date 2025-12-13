@@ -41,47 +41,6 @@ const tools = [
   { name: 'DigitalOcean', logo: '/tech-logos/digitalocean.svg' },
   { name: 'Oracle Cloud', logo: '/tech-logos/oracle.svg' },
   { name: 'IBM Cloud', logo: '/tech-logos/ibm-cloud.svg' },
-  // Infrastructure as Code & Configuration
-  { name: 'Terraform', logo: '/tech-logos/terraform.svg' },
-  { name: 'Ansible', logo: '/tech-logos/ansible.svg' },
-  { name: 'Chef', logo: '/tech-logos/chef.svg' },
-  { name: 'Puppet', logo: '/tech-logos/puppet.svg' },
-  // Operating Systems
-  { name: 'Linux', logo: '/tech-logos/linux.svg' },
-  { name: 'Ubuntu', logo: '/tech-logos/ubuntu.svg' },
-  { name: 'Red Hat', logo: '/tech-logos/redhat.svg' },
-  { name: 'SUSE', logo: '/tech-logos/suse.svg' },
-  { name: 'CentOS', logo: '/tech-logos/centos.svg' },
-  { name: 'Windows Server', logo: '/tech-logos/windows.svg' },
-  // Monitoring & Logging
-  { name: 'Prometheus', logo: '/tech-logos/prometheus.svg' },
-  { name: 'Grafana', logo: '/tech-logos/grafana.svg' },
-  { name: 'Nagios', logo: '/tech-logos/nagios.svg' },
-  { name: 'ELK Stack', logo: '/tech-logos/elastic.svg' },
-  // Security & Identity
-  { name: 'OAuth', logo: '/tech-logos/oauth.svg' },
-  { name: 'LDAP', logo: '/tech-logos/openldap.svg' },
-  { name: 'Vault', logo: '/tech-logos/vault.svg' },
-  { name: 'Keycloak', logo: '/tech-logos/keycloak.svg' },
-  // Web Development
-  { name: 'HTML5', logo: '/tech-logos/html5.svg' },
-  { name: 'CSS3', logo: '/tech-logos/css3.svg' },
-  { name: 'JavaScript', logo: '/tech-logos/javascript.svg' },
-  { name: 'TypeScript', logo: '/tech-logos/typescript.svg' },
-  { name: 'React', logo: '/tech-logos/react.svg' },
-  { name: 'Angular', logo: '/tech-logos/angular.svg' },
-  { name: 'Vue.js', logo: '/tech-logos/vue.svg' },
-  { name: 'Node.js', logo: '/tech-logos/nodejs.svg' },
-  // Backend & Databases
-  { name: 'MySQL', logo: '/tech-logos/mysql.svg' },
-  { name: 'PostgreSQL', logo: '/tech-logos/postgresql.svg' },
-  { name: 'MongoDB', logo: '/tech-logos/mongodb.svg' },
-  { name: 'Redis', logo: '/tech-logos/redis.svg' },
-  // CI/CD & Build Tools
-  { name: 'Maven', logo: '/tech-logos/maven.svg' },
-  { name: 'Gradle', logo: '/tech-logos/gradle.svg' },
-  { name: 'GitHub Actions', logo: '/tech-logos/githubactions.svg' },
-  { name: 'CircleCI', logo: '/tech-logos/circleci.svg' },
 ];
 
 
