@@ -99,11 +99,10 @@ export default function LoginPage() {
       await setDoc(
         userRef,
         {
-          uid: user.uid,
+          id: user.uid,
+          name: user.displayName,
           email: user.email,
-          displayName: user.displayName,
-          photoURL: user.photoURL,
-          providerId: result.providerId,
+          authProvider: result.providerId,
           lastLogin: serverTimestamp(),
         },
         { merge: true }
