@@ -291,8 +291,8 @@
   },
   "auth": {
     "providers": [
-      "password",
-      "anonymous"
+      "google.com",
+      "github.com"
     ]
   },
   "firestore": {
@@ -445,3 +445,5 @@
     "reasoning": "The Firestore data structure is designed to ensure security, scalability, and ease of debugging, while adhering to the principles of Authorization Independence, Clarity of Intent, DBAC (Database-Based Access Control), and QAPs (Rules are not Filters). It leverages structural segregation and consistent access modeling to achieve these goals.\n\n1.  **Authorization Independence:**\n\n    *   Denormalization is extensively used to avoid hierarchical authorization dependencies (`get()` calls in security rules). For example, access to `Resume` documents is controlled by the `userId` field within the document itself, rather than requiring a lookup to the parent `User` document. Similarly, collections nested under a user document (e.g. resume, skill gap analysis) include the `userId` inside the document to ensure authorization rules can validate the user's `uid` against the `userId` stored in the document. This pattern extends to subcollections as well.\n\n2.  **Structural Segregation:**\n\n    *   Data with different access needs are stored in separate collections. All user-owned data is nested under `/users/{userId}`, ensuring consistent ownership-based security rules.\n\n3.  **Access Modeling:**\n\n    *   **Private Data:** Path-based ownership is used for user-specific data (`/users/{userId}/resumes/{resumeId}`).\n    *   **Hierarchical Paths:** User-owned data is structured using hierarchical paths (e.g., `/users/{userId}/resumes/{resumeId}`), which makes ownership-based security rules straightforward and efficient.\n    *   **Global Roles (DBAC):** Roles are managed through the existence of documents in dedicated collections (e.g., `/roles_admin/{uid}`), avoiding custom claims.\n\n4.  **QAPs (Rules are not Filters):**\n\n    *   The structure enables secure `list` operations because authorization rules can be applied directly to the documents in a collection without needing to filter based on document data after retrieval. Segregation into user-owned subcollections (`/users/{userId}/...`) ensures that listing is always scoped to the authorized user.\n\n5. **Error mitigation:**\n\n   * The error `FirebaseError: Firebase: Error (auth/operation-not-allowed)` arises from attempting an operation that the current authentication state doesn't allow. With anonymous authentication, certain operations are restricted. To resolve this error, the application logic needs to ensure only permitted operations are triggered while in anonymous mode. This may involve conditionally disabling or hiding features that require a full user account. The data structure design facilitates these constraints by strictly delineating user-owned versus potentially public or shared data.\n\n\n"
   }
 }
+
+    
