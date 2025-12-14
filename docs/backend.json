@@ -53,68 +53,37 @@
         },
         "uploadDate": {
           "type": "string",
-          "description": "The timestamp when the resume was uploaded.",
+          "description": "The resume's uploaded date.",
           "format": "date-time"
         },
-        "fileUrl": {
+        "fileLocation": {
           "type": "string",
-          "description": "The URL where the resume file is stored.",
-          "format": "uri"
+          "description": "The path to the resume file."
         },
-        "text": {
+        "atsScore": {
+          "type": "number",
+          "description": "The ATS score of this resume."
+        },
+        "improvementSuggestions": {
           "type": "string",
-          "description": "Extracted text content from the resume."
+          "description": "AI-generated suggestions to improve the resume.",
+          "format": "string"
         }
       },
       "required": [
         "id",
         "userId",
         "uploadDate",
-        "fileUrl",
-        "text"
-      ]
-    },
-    "ResumeAnalysis": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "ResumeAnalysis",
-      "type": "object",
-      "description": "Stores the analysis results for a resume.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the ResumeAnalysis entity."
-        },
-        "resumeId": {
-          "type": "string",
-          "description": "Reference to Resume. (Relationship: Resume 1:N ResumeAnalysis)"
-        },
-        "atsScore": {
-          "type": "number",
-          "description": "The ATS score generated for the resume (0-100)."
-        },
-        "improvementSuggestions": {
-          "type": "string",
-          "description": "AI-generated suggestions for improving the resume."
-        },
-        "analysisDate": {
-          "type": "string",
-          "description": "Timestamp of when the analysis was performed.",
-          "format": "date-time"
-        }
-      },
-      "required": [
-        "id",
-        "resumeId",
+        "fileLocation",
         "atsScore",
-        "improvementSuggestions",
-        "analysisDate"
+        "improvementSuggestions"
       ]
     },
     "InterviewSession": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "InterviewSession",
       "type": "object",
-      "description": "Represents a mock interview session.",
+      "description": "Represents an interview session conducted by a user.",
       "properties": {
         "id": {
           "type": "string",
@@ -128,79 +97,83 @@
           "type": "string",
           "description": "The job role selected for the interview."
         },
-        "sessionDate": {
+        "startTime": {
           "type": "string",
-          "description": "Timestamp of when the interview session was started.",
+          "description": "Timestamp of when the interview session started.",
           "format": "date-time"
+        },
+        "endTime": {
+          "type": "string",
+          "description": "Timestamp of when the interview session ended.",
+          "format": "date-time"
+        },
+        "questionIds": {
+          "type": "array",
+          "description": "References to InterviewQuestion. (Relationship: InterviewSession 1:N InterviewQuestion)",
+          "items": {
+            "type": "string"
+          }
         }
       },
       "required": [
         "id",
         "userId",
         "jobRole",
-        "sessionDate"
+        "startTime",
+        "endTime",
+        "questionIds"
       ]
     },
-    "InterviewAnswer": {
+    "InterviewQuestion": {
       "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "InterviewAnswer",
+      "title": "InterviewQuestion",
       "type": "object",
-      "description": "Represents a user's answer to an interview question within a session.",
+      "description": "Represents a question in an interview session.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the InterviewAnswer entity."
+          "description": "Unique identifier for the InterviewQuestion entity."
         },
-        "sessionId": {
+        "interviewSessionId": {
           "type": "string",
-          "description": "Reference to InterviewSession. (Relationship: InterviewSession 1:N InterviewAnswer)"
+          "description": "Reference to InterviewSession. (Relationship: InterviewSession 1:N InterviewQuestion)"
         },
-        "question": {
+        "questionText": {
           "type": "string",
-          "description": "The interview question asked."
+          "description": "The text of the interview question."
         },
-        "answer": {
+        "userAnswer": {
           "type": "string",
-          "description": "The user's answer to the question."
+          "description": "The user's answer to the interview question."
         },
-        "correctnessScore": {
-          "type": "number",
-          "description": "AI-evaluated correctness score for the answer."
+        "aiEvaluation": {
+          "type": "string",
+          "description": "AI evaluation of the user's answer."
         },
-        "clarityScore": {
+        "score": {
           "type": "number",
-          "description": "AI-evaluated clarity score for the answer."
-        },
-        "confidenceScore": {
-          "type": "number",
-          "description": "AI-evaluated confidence score for the answer."
+          "description": "Score assigned to the user's answer."
         },
         "modelAnswer": {
           "type": "string",
-          "description": "AI-generated model answer for the question."
-        },
-        "improvementSuggestions": {
-          "type": "string",
-          "description": "AI-generated suggestions for improving the answer."
+          "description": "A model answer for the interview question."
         }
       },
       "required": [
         "id",
-        "sessionId",
-        "question",
-        "answer",
-        "correctnessScore",
-        "clarityScore",
-        "confidenceScore",
-        "modelAnswer",
-        "improvementSuggestions"
+        "interviewSessionId",
+        "questionText",
+        "userAnswer",
+        "aiEvaluation",
+        "score",
+        "modelAnswer"
       ]
     },
     "SkillGapAnalysis": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "SkillGapAnalysis",
       "type": "object",
-      "description": "Stores the results of a skill-gap analysis.",
+      "description": "Represents the result of a skill-gap analysis.",
       "properties": {
         "id": {
           "type": "string",
@@ -210,17 +183,19 @@
           "type": "string",
           "description": "Reference to User. (Relationship: User 1:N SkillGapAnalysis)"
         },
-        "jobRole": {
-          "type": "string",
-          "description": "The job role used for the skill-gap analysis."
-        },
         "missingSkills": {
-          "type": "string",
-          "description": "Comma-separated list of missing skills identified."
+          "type": "array",
+          "description": "List of missing skills identified during the analysis.",
+          "items": {
+            "type": "string"
+          }
         },
         "learningRoadmap": {
-          "type": "string",
-          "description": "Personalized learning roadmap generated for the user."
+          "type": "array",
+          "description": "A roadmap with resources",
+          "items": {
+            "type": "string"
+          }
         },
         "analysisDate": {
           "type": "string",
@@ -231,7 +206,6 @@
       "required": [
         "id",
         "userId",
-        "jobRole",
         "missingSkills",
         "learningRoadmap",
         "analysisDate"
@@ -241,7 +215,7 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "JobDescriptionAnalysis",
       "type": "object",
-      "description": "Stores the analysis results for a job description.",
+      "description": "Represents the analysis of a job description.",
       "properties": {
         "id": {
           "type": "string",
@@ -253,23 +227,36 @@
         },
         "jobDescriptionText": {
           "type": "string",
-          "description": "The full text of the job description."
+          "description": "The text of the job description analyzed."
         },
         "requiredSkills": {
-          "type": "string",
-          "description": "Comma-separated list of required skills extracted from the job description."
+          "type": "array",
+          "description": "List of required skills extracted from the job description.",
+          "items": {
+            "type": "string"
+          }
         },
         "experienceLevel": {
           "type": "string",
-          "description": "The experience level required for the job."
+          "description": "The experience level specified in the job description."
         },
-        "missingKeywords": {
-          "type": "string",
-          "description": "Comma-separated list of missing keywords from the user's resume compared to the job description."
+        "keywords": {
+          "type": "array",
+          "description": "Keywords extracted from the job description.",
+          "items": {
+            "type": "string"
+          }
         },
         "matchPercentage": {
           "type": "number",
-          "description": "The percentage match between the user's resume and the job description."
+          "description": "The percentage to the user's resume based on the analysis."
+        },
+        "missingKeywords": {
+          "type": "array",
+          "description": "Keywords missing from the user's resume.",
+          "items": {
+            "type": "string"
+          }
         },
         "analysisDate": {
           "type": "string",
@@ -283,16 +270,17 @@
         "jobDescriptionText",
         "requiredSkills",
         "experienceLevel",
-        "missingKeywords",
+        "keywords",
         "matchPercentage",
+        "missingKeywords",
         "analysisDate"
       ]
     }
   },
   "auth": {
     "providers": [
-      "google.com",
-      "github.com"
+      "password",
+      "anonymous"
     ]
   },
   "firestore": {
@@ -304,7 +292,7 @@
           "schema": {
             "$ref": "#/backend/entities/User"
           },
-          "description": "Stores user profile information.  Authorization is based on the `userId` parameter matching the `request.auth.uid`.",
+          "description": "Stores user profile information. Secured by user ID.",
           "params": [
             {
               "name": "userId",
@@ -320,7 +308,7 @@
           "schema": {
             "$ref": "#/backend/entities/Resume"
           },
-          "description": "Stores user resumes. Includes denormalized 'userId' field for authorization independence. Authorization is based on the `userId` parameter matching the `request.auth.uid`.",
+          "description": "Stores user resumes. Secured by user ID. The userId is denormalized into the resume document.",
           "params": [
             {
               "name": "userId",
@@ -334,116 +322,90 @@
         }
       },
       {
-        "path": "/users/{userId}/resumes/{resumeId}/analyses/{analysisId}",
-        "definition": {
-          "entityName": "ResumeAnalysis",
-          "schema": {
-            "$ref": "#/backend/entities/ResumeAnalysis"
-          },
-          "description": "Stores resume analysis results. Includes denormalized 'userId' field (from parent Resume) for authorization independence. Authorization is based on the `userId` parameter matching the `request.auth.uid`.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier for the user."
-            },
-            {
-              "name": "resumeId",
-              "description": "The unique identifier for the resume."
-            },
-            {
-              "name": "analysisId",
-              "description": "The unique identifier for the analysis."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/users/{userId}/interview_sessions/{sessionId}",
+        "path": "/users/{userId}/interviewSessions/{interviewSessionId}",
         "definition": {
           "entityName": "InterviewSession",
           "schema": {
             "$ref": "#/backend/entities/InterviewSession"
           },
-          "description": "Stores interview session information. Includes denormalized 'userId' field for authorization independence. Authorization is based on the `userId` parameter matching the `request.auth.uid`.",
+          "description": "Stores interview sessions conducted by the user. Secured by user ID. The userId is denormalized into the interviewSession document.",
           "params": [
             {
               "name": "userId",
               "description": "The unique identifier for the user."
             },
             {
-              "name": "sessionId",
+              "name": "interviewSessionId",
               "description": "The unique identifier for the interview session."
             }
           ]
         }
       },
       {
-        "path": "/users/{userId}/interview_sessions/{sessionId}/answers/{answerId}",
+        "path": "/users/{userId}/interviewSessions/{interviewSessionId}/interviewQuestions/{interviewQuestionId}",
         "definition": {
-          "entityName": "InterviewAnswer",
+          "entityName": "InterviewQuestion",
           "schema": {
-            "$ref": "#/backend/entities/InterviewAnswer"
+            "$ref": "#/backend/entities/InterviewQuestion"
           },
-          "description": "Stores interview answers for a session. Includes denormalized 'userId' field (from parent InterviewSession) for authorization independence. Authorization is based on the `userId` parameter matching the `request.auth.uid`.",
+          "description": "Stores individual interview questions within an interview session. Secured by user ID and interview session ID. The userId and interviewSessionId are denormalized into the interviewQuestion document.",
           "params": [
             {
               "name": "userId",
               "description": "The unique identifier for the user."
             },
             {
-              "name": "sessionId",
+              "name": "interviewSessionId",
               "description": "The unique identifier for the interview session."
             },
             {
-              "name": "answerId",
-              "description": "The unique identifier for the interview answer."
+              "name": "interviewQuestionId",
+              "description": "The unique identifier for the interview question."
             }
           ]
         }
       },
       {
-        "path": "/users/{userId}/skill_gap_analyses/{analysisId}",
+        "path": "/users/{userId}/skillGapAnalyses/{skillGapAnalysisId}",
         "definition": {
           "entityName": "SkillGapAnalysis",
           "schema": {
             "$ref": "#/backend/entities/SkillGapAnalysis"
           },
-          "description": "Stores skill-gap analysis results. Includes denormalized 'userId' field for authorization independence. Authorization is based on the `userId` parameter matching the `request.auth.uid`.",
+          "description": "Stores skill gap analysis results for the user. Secured by user ID. The userId is denormalized into the skillGapAnalysis document.",
           "params": [
             {
               "name": "userId",
               "description": "The unique identifier for the user."
             },
             {
-              "name": "analysisId",
+              "name": "skillGapAnalysisId",
               "description": "The unique identifier for the skill gap analysis."
             }
           ]
         }
       },
       {
-        "path": "/users/{userId}/job_description_analyses/{analysisId}",
+        "path": "/users/{userId}/jobDescriptionAnalyses/{jobDescriptionAnalysisId}",
         "definition": {
           "entityName": "JobDescriptionAnalysis",
           "schema": {
             "$ref": "#/backend/entities/JobDescriptionAnalysis"
           },
-          "description": "Stores job description analysis results. Includes denormalized 'userId' field for authorization independence. Authorization is based on the `userId` parameter matching the `request.auth.uid`.",
+          "description": "Stores job description analysis results for the user. Secured by user ID. The userId is denormalized into the jobDescriptionAnalysis document.",
           "params": [
             {
               "name": "userId",
               "description": "The unique identifier for the user."
             },
             {
-              "name": "analysisId",
+              "name": "jobDescriptionAnalysisId",
               "description": "The unique identifier for the job description analysis."
             }
           ]
         }
       }
     ],
-    "reasoning": "The Firestore data structure is designed to ensure security, scalability, and ease of debugging, while adhering to the principles of Authorization Independence, Clarity of Intent, DBAC (Database-Based Access Control), and QAPs (Rules are not Filters). It leverages structural segregation and consistent access modeling to achieve these goals.\n\n1.  **Authorization Independence:**\n\n    *   Denormalization is extensively used to avoid hierarchical authorization dependencies (`get()` calls in security rules). For example, access to `Resume` documents is controlled by the `userId` field within the document itself, rather than requiring a lookup to the parent `User` document. Similarly, collections nested under a user document (e.g. resume, skill gap analysis) include the `userId` inside the document to ensure authorization rules can validate the user's `uid` against the `userId` stored in the document. This pattern extends to subcollections as well.\n\n2.  **Structural Segregation:**\n\n    *   Data with different access needs are stored in separate collections. All user-owned data is nested under `/users/{userId}`, ensuring consistent ownership-based security rules.\n\n3.  **Access Modeling:**\n\n    *   **Private Data:** Path-based ownership is used for user-specific data (`/users/{userId}/resumes/{resumeId}`).\n    *   **Hierarchical Paths:** User-owned data is structured using hierarchical paths (e.g., `/users/{userId}/resumes/{resumeId}`), which makes ownership-based security rules straightforward and efficient.\n    *   **Global Roles (DBAC):** Roles are managed through the existence of documents in dedicated collections (e.g., `/roles_admin/{uid}`), avoiding custom claims.\n\n4.  **QAPs (Rules are not Filters):**\n\n    *   The structure enables secure `list` operations because authorization rules can be applied directly to the documents in a collection without needing to filter based on document data after retrieval. Segregation into user-owned subcollections (`/users/{userId}/...`) ensures that listing is always scoped to the authorized user.\n\n5. **Error mitigation:**\n\n   * The error `FirebaseError: Firebase: Error (auth/operation-not-allowed)` arises from attempting an operation that the current authentication state doesn't allow. With anonymous authentication, certain operations are restricted. To resolve this error, the application logic needs to ensure only permitted operations are triggered while in anonymous mode. This may involve conditionally disabling or hiding features that require a full user account. The data structure design facilitates these constraints by strictly delineating user-owned versus potentially public or shared data.\n\n\n"
+    "reasoning": "The Firestore structure is designed to ensure Authorization Independence, DBAC, and support secure list operations (QAPs). User-owned data is structured under `/users/{userId}` for clear ownership. All collections are segregated to ensure homogeneous security posture.  Authorization independence is achieved by avoiding `get()` calls within the security rules. This is accomplished by structuring data in a way where access control can be determined solely based on the `request.auth.uid` and the path of the request, ensuring that security rules are atomic and easier to debug. By using path-based ownership, we leverage Firestore's built-in security features to define access control rules effectively. This approach is suitable for the CareerPilot AI platform to manage user resumes, interview sessions, skill gap analysis, and job description analysis."
   }
 }
-
-    
