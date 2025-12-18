@@ -30,13 +30,11 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  experimental: {
-    turbo: {
-      rules: {
-        "**/*.svg": {
-          as: "*.js",
-          loaders: ["@svgr/webpack"],
-        },
+  turbopack: {
+    rules: {
+      "**/*.svg": {
+        as: "*.js",
+        loaders: ["@svgr/webpack"],
       },
     },
   },
