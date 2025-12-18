@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { onAuthStateChanged, type User } from 'firebase/auth';
-import { useAuth } from './use-auth';
+import { useAuthContext } from '../provider';
 
 interface UserState {
   user: User | null;
@@ -11,7 +11,7 @@ interface UserState {
 }
 
 export function useUser(): UserState {
-  const auth = useAuth();
+  const auth = useAuthContext();
   const [userState, setUserState] = useState<UserState>({
     user: null,
     loading: true,
@@ -31,6 +31,8 @@ export function useUser(): UserState {
       );
       return () => unsubscribe();
     } else {
+      // If auth is not available, we are not loading and there is no user.
+      // This can happen in server components or before Firebase is initialized.
       setUserState({ user: null, loading: false, error: null });
     }
   }, [auth]);

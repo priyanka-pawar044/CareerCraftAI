@@ -10,18 +10,17 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { Chrome, Github } from 'lucide-react';
 import Image from 'next/image';
-import { useAuth } from '@/firebase/auth/use-auth';
+import { useAuthContext } from '@/firebase/provider';
 import {
-  getAuth,
   signInWithPopup,
   GoogleAuthProvider,
   GithubAuthProvider,
 } from 'firebase/auth';
-import { useUser } from '@/firebase/auth/use-user';
+import { useUser } from '@/firebase';
 import { redirect } from 'next/navigation';
 import { useEffect } from 'react';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { useFirestore } from '@/firebase/firestore/use-firestore';
+import { useFirestoreContext } from '@/firebase/provider';
 
 const tools = [
   // DevOps & Containerization
@@ -74,9 +73,9 @@ const animationStyles = `
 `;
 
 export default function LoginPage() {
-  const auth = useAuth();
-  const firestore = useFirestore();
-  const { user, loading } = useUser();
+  const auth = useAuthContext();
+  const firestore = useFirestoreContext();
+  const { user, isUserLoading } = useUser();
 
   useEffect(() => {
     if (user) {
@@ -113,7 +112,7 @@ export default function LoginPage() {
     }
   };
 
-  if (loading) {
+  if (isUserLoading) {
     return <div>Loading...</div>;
   }
   
