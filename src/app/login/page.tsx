@@ -1,3 +1,4 @@
+
 'use client';
 import { Button } from '@/components/ui/button';
 import {
@@ -105,7 +106,11 @@ export default function LoginPage() {
         { merge: true }
       );
       // No need to redirect here, the useEffect will handle it
-    } catch (error) {
+    } catch (error: any) {
+      // Don't log an error if the user cancels the popup
+      if (error.code === 'auth/cancelled-popup-request') {
+        return;
+      }
       console.error('Authentication error:', error);
     }
   };
