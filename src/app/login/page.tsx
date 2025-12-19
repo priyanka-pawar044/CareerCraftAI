@@ -1,4 +1,3 @@
-
 'use client';
 import { Button } from '@/components/ui/button';
 import {
@@ -20,6 +19,7 @@ import {
 import { redirect } from 'next/navigation';
 import { useEffect } from 'react';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { FirebaseClientProvider } from '@/firebase/client-provider';
 
 const tools = [
   // DevOps & Containerization
