@@ -1,8 +1,8 @@
 export const firebaseConfig = {
-  "projectId": "studio-8555919986-7f9c9",
-  "appId": "1:1014097693518:web:5e5ad301316269effaac1f",
-  "storageBucket": "studio-8555919986-7f9c9.appspot.com",
-  "apiKey": "AIzaSyBv8pjOZbkaO4yJateq7aZjmCFUsYwbZIs",
-  "authDomain": "studio-8555919986-7f9c9.firebaseapp.com",
-  "messagingSenderId": "1014097693518"
+  "projectId": "careerpilot-ai-app",
+  "appId": "1:654128521013:web:a78be6f190a6c0c27258e7",
+  "storageBucket": "careerpilot-ai-app.appspot.com",
+  "apiKey": "AIzaSyCVfVxxmhw1yxda5T1tQVWx_LwQUrEW4-I",
+  "authDomain": "careerpilot-ai-app.firebaseapp.com",
+  "messagingSenderId": "654128521013"
 };
