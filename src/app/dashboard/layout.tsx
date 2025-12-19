@@ -11,7 +11,7 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, loading, error } = useUser();
+  const { user, isUserLoading: loading, userError: error } = useUser();
 
   useEffect(() => {
     if (!loading && !user) {
