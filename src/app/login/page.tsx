@@ -81,15 +81,15 @@ export default function LoginPage() {
     }
   }, [user]);
 
-  const handleSignIn = async (provider: 'google' | 'github') => {
+  const handleSignIn = async (providerName: 'google' | 'github') => {
     if (!auth || !firestore) return;
-    const authProvider =
-      provider === 'google'
+    const provider =
+      providerName === 'google'
         ? new GoogleAuthProvider()
         : new GithubAuthProvider();
 
     try {
-      const result = await signInWithPopup(auth, authProvider);
+      const result = await signInWithPopup(auth, provider);
       const user = result.user;
       
       const userRef = doc(firestore, 'users', user.uid);
@@ -104,7 +104,7 @@ export default function LoginPage() {
         },
         { merge: true }
       );
-      redirect('/dashboard');
+      // No need to redirect here, the useEffect will handle it
     } catch (error) {
       console.error('Authentication error:', error);
     }
