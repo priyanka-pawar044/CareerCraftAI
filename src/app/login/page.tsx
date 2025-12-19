@@ -10,13 +10,12 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { Chrome, Github } from 'lucide-react';
 import Image from 'next/image';
-import { useAuthContext, useFirestoreContext } from '@/firebase/provider';
+import { useAuth, useFirestore, useUser } from '@/firebase';
 import {
   signInWithPopup,
   GoogleAuthProvider,
   GithubAuthProvider,
 } from 'firebase/auth';
-import { useUser } from '@/firebase/provider';
 import { redirect } from 'next/navigation';
 import { useEffect } from 'react';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
@@ -72,8 +71,8 @@ const animationStyles = `
 `;
 
 export default function LoginPage() {
-  const auth = useAuthContext();
-  const firestore = useFirestoreContext();
+  const auth = useAuth();
+  const firestore = useFirestore();
   const { user, isUserLoading } = useUser();
 
   useEffect(() => {

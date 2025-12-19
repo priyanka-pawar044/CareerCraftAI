@@ -21,9 +21,8 @@ import {
   Target,
 } from 'lucide-react';
 import { Logo } from '@/components/icons';
-import { useAuthContext } from '@/firebase/provider';
+import { useAuth, useUser } from '@/firebase';
 import { signOut } from 'firebase/auth';
-import { useUser } from '@/firebase';
 
 const navItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -43,7 +42,7 @@ const navItems = [
 
 export function AppSidebar() {
   const pathname = usePathname();
-  const auth = useAuthContext();
+  const auth = useAuth();
   const { user } = useUser();
 
   const handleLogout = async () => {
