@@ -10,17 +10,16 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { Chrome, Github } from 'lucide-react';
 import Image from 'next/image';
-import { useAuthContext } from '@/firebase/provider';
+import { useAuthContext, useFirestoreContext } from '@/firebase/provider';
 import {
   signInWithPopup,
   GoogleAuthProvider,
   GithubAuthProvider,
 } from 'firebase/auth';
-import { useUser } from '@/firebase';
+import { useUser } from '@/firebase/provider';
 import { redirect } from 'next/navigation';
 import { useEffect } from 'react';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { useFirestoreContext } from '@/firebase/provider';
 
 const tools = [
   // DevOps & Containerization
