@@ -28,8 +28,8 @@ export async function POST(request: Request) {
     const userDoc = querySnapshot.docs[0];
     const user = userDoc.data();
 
-    // The user might not have a passwordHash if they were created with a different provider
-    if (!user.passwordHash) {
+    // Check if the auth provider is password-based
+    if (user.authProvider !== 'password' || !user.passwordHash) {
       return NextResponse.json({ message: 'Invalid credentials' }, { status: 401 });
     }
 

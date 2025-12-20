@@ -32,7 +32,7 @@ export async function POST(request: Request) {
       name,
       email,
       passwordHash,
-      authProvider: 'email',
+      authProvider: 'password',
       lastLogin: serverTimestamp(),
       createdAt: serverTimestamp(),
     };
