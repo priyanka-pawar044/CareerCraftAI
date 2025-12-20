@@ -1,3 +1,4 @@
+
 'use client';
 import { Button } from '@/components/ui/button';
 import {
@@ -10,19 +11,17 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth, useUser } from '@/firebase';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { useAuth } from '@/context/AuthContext';
 import { redirect } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
 export default function LoginPage() {
-  const auth = useAuth();
-  const { user, isUserLoading } = useUser();
+  const { user, login, isLoading: isAuthLoading } = useAuth();
   const { toast } = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isPageLoading, setIsPageLoading] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -32,34 +31,24 @@ export default function LoginPage() {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!auth) {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Authentication service is not available.',
-      });
-      return;
-    }
-    setIsLoading(true);
+    setIsPageLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      await login(email, password);
       // Redirect is handled by the useEffect hook
     } catch (error: any) {
       toast({
         variant: 'destructive',
         title: 'Sign In Failed',
-        description:
-          error.code === 'auth/invalid-credential'
-            ? 'Invalid email or password.'
-            : 'An unexpected error occurred. Please try again.',
+        description: error.message || 'An unexpected error occurred. Please try again.',
       });
-      console.error('Authentication error:', error);
     } finally {
-      setIsLoading(false);
+      setIsPageLoading(false);
     }
   };
+  
+  const isLoading = isAuthLoading || isPageLoading;
 
-  if (isUserLoading || user) {
+  if (isAuthLoading || user) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
         Loading...

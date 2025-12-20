@@ -1,21 +1,22 @@
+
 'use client';
 import { redirect } from 'next/navigation';
-import { useUser } from '@/firebase';
+import { useAuth } from '@/context/AuthContext';
 import { useEffect } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function Home() {
-  const { user, isUserLoading } = useUser();
+  const { user, isLoading } = useAuth();
 
   useEffect(() => {
-    if (!isUserLoading) {
+    if (!isLoading) {
       if (user) {
         redirect('/dashboard');
       } else {
         redirect('/login');
       }
     }
-  }, [user, isUserLoading]);
+  }, [user, isLoading]);
 
   return (
     <div className="flex h-screen w-full items-center justify-center">

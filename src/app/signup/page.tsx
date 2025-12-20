@@ -1,3 +1,4 @@
+
 'use client';
 import { Button } from '@/components/ui/button';
 import {
@@ -10,23 +11,19 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth, useFirestore, useUser } from '@/firebase';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { useAuth } from '@/context/AuthContext';
 import { redirect } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
 export default function SignupPage() {
-  const auth = useAuth();
-  const firestore = useFirestore();
-  const { user, isUserLoading } = useUser();
+  const { user, signup, isLoading: isAuthLoading } = useAuth();
   const { toast } = useToast();
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isPageLoading, setIsPageLoading] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -36,14 +33,6 @@ export default function SignupPage() {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!auth || !firestore) {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Services not available. Please try again later.',
-      });
-      return;
-    }
     if (password.length < 6) {
       toast({
         variant: 'destructive',
@@ -52,45 +41,24 @@ export default function SignupPage() {
       });
       return;
     }
-    setIsLoading(true);
+    setIsPageLoading(true);
     try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      const newUser = userCredential.user;
-
-      // Save user info to Firestore
-      const userRef = doc(firestore, 'users', newUser.uid);
-      await setDoc(userRef, {
-        id: newUser.uid,
-        name: name,
-        email: newUser.email,
-        authProvider: 'password',
-        lastLogin: serverTimestamp(),
-      });
-      
+      await signup(name, email, password);
       // Redirect is handled by the useEffect hook
     } catch (error: any) {
-      let description = 'An unexpected error occurred. Please try again.';
-      if (error.code === 'auth/email-already-in-use') {
-        description = 'This email address is already in use.';
-      } else if (error.code === 'auth/weak-password') {
-        description = 'The password is too weak.'
-      }
       toast({
         variant: 'destructive',
         title: 'Sign Up Failed',
-        description,
+        description: error.message || 'An unexpected error occurred. Please try again.',
       });
-      console.error('Sign up error:', error);
     } finally {
-      setIsLoading(false);
+      setIsPageLoading(false);
     }
   };
   
-  if (isUserLoading || user) {
+  const isLoading = isAuthLoading || isPageLoading;
+
+  if (isAuthLoading || user) {
     return <div className="flex h-screen w-full items-center justify-center">Loading...</div>;
   }
 

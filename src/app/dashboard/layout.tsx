@@ -1,7 +1,8 @@
+
 'use client';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
-import { useUser } from '@/firebase';
+import { useAuth } from '@/context/AuthContext';
 import { redirect } from 'next/navigation';
 import { useEffect } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -11,15 +12,15 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, isUserLoading: loading, userError: error } = useUser();
+  const { user, isLoading } = useAuth();
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!isLoading && !user) {
       redirect('/login');
     }
-  }, [user, loading]);
+  }, [user, isLoading]);
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
         <div className="flex items-start space-x-4 p-4">
@@ -33,13 +34,9 @@ export default function DashboardLayout({
       </div>
     );
   }
-
-  if (error) {
-    return <p>Error: {error.message}</p>;
-  }
   
   if (!user) {
-    return null; // Or a fallback UI
+    return null; // Or a fallback UI while redirecting
   }
 
   return (
