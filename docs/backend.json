@@ -21,7 +21,7 @@
         },
         "authProvider": {
           "type": "string",
-          "description": "The authentication provider used by the user (e.g., Google, GitHub)."
+          "description": "The authentication provider used by the user (e.g., password)."
         },
         "lastLogin": {
           "type": "string",
@@ -282,8 +282,7 @@
   },
   "auth": {
     "providers": [
-      "password",
-      "anonymous"
+      "password"
     ]
   },
   "firestore": {

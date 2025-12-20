@@ -21,7 +21,7 @@ import {
   Target,
 } from 'lucide-react';
 import { Logo } from '@/components/icons';
-import { useAuth, useUser } from '@/firebase';
+import { useAuth } from '@/firebase';
 import { signOut } from 'firebase/auth';
 
 const navItems = [
@@ -43,7 +43,6 @@ const navItems = [
 export function AppSidebar() {
   const pathname = usePathname();
   const auth = useAuth();
-  const { user } = useUser();
 
   const handleLogout = async () => {
     if (auth) {
@@ -83,10 +82,12 @@ export function AppSidebar() {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton tooltip="Settings">
-              <Settings />
-              <span>Settings</span>
-            </SidebarMenuButton>
+             <Link href="/dashboard/settings">
+                <SidebarMenuButton tooltip="Settings" isActive={pathname === '/dashboard/settings'}>
+                  <Settings />
+                  <span>Settings</span>
+                </SidebarMenuButton>
+              </Link>
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton tooltip="Logout" onClick={handleLogout}>
