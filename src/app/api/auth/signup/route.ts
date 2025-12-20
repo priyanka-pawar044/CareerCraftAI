@@ -1,5 +1,5 @@
 
-import { getFirestore, collection, addDoc, query, where, getDocs, serverTimestamp, doc, updateDoc } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
 import { initializeFirebase } from '@/firebase';
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
@@ -28,18 +28,18 @@ export async function POST(request: Request) {
 
     const passwordHash = await bcrypt.hash(password, 10);
 
+    // This data object will be added to Firestore first, without the ID.
     const newUser = {
       name,
       email,
       passwordHash,
       authProvider: 'password',
-      lastLogin: serverTimestamp(),
-      createdAt: serverTimestamp(),
+      lastLogin: new Date().toISOString(), // Use ISO string to match schema
     };
 
     const docRef = await addDoc(collection(firestore, 'users'), newUser);
     
-    // Add the auto-generated ID to the document
+    // Now, update the newly created document to include its own ID.
     await updateDoc(docRef, { id: docRef.id });
     
     const userPayload = { id: docRef.id, name, email };

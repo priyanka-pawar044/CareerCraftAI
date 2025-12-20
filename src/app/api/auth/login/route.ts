@@ -1,5 +1,5 @@
 
-import { getFirestore, collection, query, where, getDocs, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { getFirestore, collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
 import { initializeFirebase } from '@/firebase';
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
@@ -41,7 +41,7 @@ export async function POST(request: Request) {
 
     // Update last login
     await updateDoc(doc(firestore, 'users', userDoc.id), {
-        lastLogin: serverTimestamp(),
+        lastLogin: new Date().toISOString(), // Use ISO string to match schema
     });
     
     const userPayload = { id: userDoc.id, name: user.name, email: user.email };
