@@ -34,7 +34,7 @@ export async function POST(request: Request) {
       email,
       passwordHash,
       authProvider: 'password',
-      lastLogin: new Date().toISOString(), // Use ISO string to match schema
+      lastLogin: new Date().toISOString(),
     };
 
     const docRef = await addDoc(collection(firestore, 'users'), newUser);

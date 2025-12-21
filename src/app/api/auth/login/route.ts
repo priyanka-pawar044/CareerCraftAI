@@ -41,7 +41,7 @@ export async function POST(request: Request) {
 
     // Update last login
     await updateDoc(doc(firestore, 'users', userDoc.id), {
-        lastLogin: new Date().toISOString(), // Use ISO string to match schema
+        lastLogin: new Date().toISOString(),
     });
     
     const userPayload = { id: userDoc.id, name: user.name, email: user.email };
