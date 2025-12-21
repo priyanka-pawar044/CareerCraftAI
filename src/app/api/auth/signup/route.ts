@@ -1,5 +1,5 @@
 
-import { collection, addDoc, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { collection, doc, getDocs, query, setDoc, where } from 'firebase/firestore';
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { sign } from 'jsonwebtoken';
@@ -67,7 +67,11 @@ export async function POST(request: Request) {
 
     const passwordHash = await bcrypt.hash(password, 10);
 
+    // Generate a new document reference with an auto-generated ID
+    const newDocRef = doc(collection(firestore, 'users'));
+    
     const newUser = {
+      id: newDocRef.id, // Use the generated ID
       name,
       email,
       passwordHash,
@@ -75,11 +79,10 @@ export async function POST(request: Request) {
       lastLogin: new Date().toISOString(),
     };
 
-    const docRef = await addDoc(collection(firestore, 'users'), newUser);
+    // Use setDoc to create the document with the specified ID
+    await setDoc(newDocRef, newUser);
     
-    await updateDoc(docRef, { id: docRef.id });
-    
-    const userPayload = { id: docRef.id, name, email };
+    const userPayload = { id: newDocRef.id, name, email };
     
     const secret = process.env.JWT_SECRET;
     if (!secret) {
