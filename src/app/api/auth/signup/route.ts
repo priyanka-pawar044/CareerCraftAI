@@ -1,13 +1,13 @@
 
-import { getFirestore, collection, addDoc, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
-import { initializeFirebase } from '@/firebase';
+import { collection, addDoc, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { initializeFirebaseAdmin } from '@/firebase/admin';
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { sign } from 'jsonwebtoken';
 import { cookies } from 'next/headers';
 
-// Ensure Firebase is initialized
-const { firestore } = initializeFirebase();
+// Ensure Firebase Admin is initialized
+const { firestore } = initializeFirebaseAdmin();
 
 export async function POST(request: Request) {
   try {
