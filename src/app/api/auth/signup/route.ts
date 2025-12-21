@@ -1,15 +1,55 @@
 
 import { collection, addDoc, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
-import { initializeFirebaseAdmin } from '@/firebase/admin';
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { sign } from 'jsonwebtoken';
 import { cookies } from 'next/headers';
+import * as admin from 'firebase-admin';
 
-// Ensure Firebase Admin is initialized
-const { firestore } = initializeFirebaseAdmin();
+// Helper function to initialize Firebase Admin SDK
+const initializeAdmin = () => {
+  if (admin.apps.length > 0) {
+    return { firestore: admin.firestore() };
+  }
+
+  const privateKey = process.env.FIREBASE_PRIVATE_KEY;
+  if (!privateKey) {
+    throw new Error('The FIREBASE_PRIVATE_KEY environment variable is not set.');
+  }
+  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+  if (!clientEmail) {
+    throw new Error('The FIREBASE_CLIENT_EMAIL environment variable is not set.');
+  }
+  const projectId = process.env.FIREBASE_PROJECT_ID;
+  if (!projectId) {
+    throw new Error('The FIREBASE_PROJECT_ID environment variable is not set.');
+  }
+
+  try {
+    admin.initializeApp({
+      credential: admin.credential.cert({
+        projectId,
+        clientEmail,
+        privateKey: privateKey.replace(/\\n/g, '\n'),
+      }),
+    });
+  } catch (error: any) {
+    console.error('Firebase Admin SDK initialization error:', error.message);
+    throw new Error('Failed to initialize Firebase Admin SDK.');
+  }
+  return { firestore: admin.firestore() };
+};
+
 
 export async function POST(request: Request) {
+  let firestore: admin.firestore.Firestore;
+  try {
+    firestore = initializeAdmin().firestore;
+  } catch (error: any) {
+    console.error("Firebase Admin Init Error:", error);
+    return NextResponse.json({ message: 'Server configuration error.' }, { status: 500 });
+  }
+
   try {
     const { name, email, password } = await request.json();
 
@@ -17,7 +57,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'Name, email, and password are required' }, { status: 400 });
     }
 
-    // Check if user already exists
     const usersRef = collection(firestore, 'users');
     const q = query(usersRef, where('email', '==', email));
     const querySnapshot = await getDocs(q);
@@ -28,7 +67,6 @@ export async function POST(request: Request) {
 
     const passwordHash = await bcrypt.hash(password, 10);
 
-    // This data object will be added to Firestore first, without the ID.
     const newUser = {
       name,
       email,
@@ -39,19 +77,16 @@ export async function POST(request: Request) {
 
     const docRef = await addDoc(collection(firestore, 'users'), newUser);
     
-    // Now, update the newly created document to include its own ID.
     await updateDoc(docRef, { id: docRef.id });
     
     const userPayload = { id: docRef.id, name, email };
     
-    // Create JWT
     const secret = process.env.JWT_SECRET;
     if (!secret) {
         throw new Error('JWT_SECRET environment variable is not set.');
     }
     const token = sign(userPayload, secret, { expiresIn: '7d' });
 
-    // Set cookie
     cookies().set('session_token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
