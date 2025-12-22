@@ -1,5 +1,4 @@
 
-import { collection, doc, getDocs, query, setDoc, where } from 'firebase/firestore';
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { sign } from 'jsonwebtoken';
@@ -57,9 +56,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'Name, email, and password are required' }, { status: 400 });
     }
 
-    const usersRef = collection(firestore, 'users');
-    const q = query(usersRef, where('email', '==', email));
-    const querySnapshot = await getDocs(q);
+    const usersRef = firestore.collection('users');
+    const q = usersRef.where('email', '==', email);
+    const querySnapshot = await q.get();
 
     if (!querySnapshot.empty) {
       return NextResponse.json({ message: 'Email is already in use' }, { status: 409 });
@@ -68,7 +67,7 @@ export async function POST(request: Request) {
     const passwordHash = await bcrypt.hash(password, 10);
 
     // Generate a new document reference with an auto-generated ID
-    const newDocRef = doc(collection(firestore, 'users'));
+    const newDocRef = usersRef.doc();
     
     const newUser = {
       id: newDocRef.id, // Use the generated ID
@@ -79,8 +78,8 @@ export async function POST(request: Request) {
       lastLogin: new Date().toISOString(),
     };
 
-    // Use setDoc to create the document with the specified ID
-    await setDoc(newDocRef, newUser);
+    // Use set to create the document with the specified ID
+    await newDocRef.set(newUser);
     
     const userPayload = { id: newDocRef.id, name, email };
     

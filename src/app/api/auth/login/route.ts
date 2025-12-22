@@ -1,5 +1,4 @@
 
-import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { sign } from 'jsonwebtoken';
@@ -56,9 +55,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'Email and password are required' }, { status: 400 });
     }
 
-    const usersRef = collection(firestore, 'users');
-    const q = query(usersRef, where('email', '==', email));
-    const querySnapshot = await getDocs(q);
+    const usersRef = firestore.collection('users');
+    const q = usersRef.where('email', '==', email);
+    const querySnapshot = await q.get();
 
     if (querySnapshot.empty) {
       return NextResponse.json({ message: 'Invalid credentials' }, { status: 401 });
@@ -77,7 +76,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'Invalid credentials' }, { status: 401 });
     }
 
-    await updateDoc(doc(firestore, 'users', userDoc.id), {
+    await userDoc.ref.update({
         lastLogin: new Date().toISOString(),
     });
     
