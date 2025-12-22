@@ -1,3 +1,4 @@
+
 import type {Config} from 'tailwindcss';
 
 export default {
@@ -65,6 +66,7 @@ export default {
           border: 'hsl(var(--sidebar-border))',
           ring: 'hsl(var(--sidebar-ring))',
         },
+        'cyber-purple': '#5e27b8',
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -88,10 +90,20 @@ export default {
             height: '0',
           },
         },
+        float: {
+          '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
+          '50%': { transform: 'translateY(-20px) rotate(3deg)' },
+        },
+        'float-reverse': {
+          '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
+          '50%': { transform: 'translateY(20px) rotate(-3deg)' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
+        float: 'float var(--duration, 10s) ease-in-out infinite',
+        'float-reverse': 'float-reverse var(--duration, 10s) ease-in-out infinite',
       },
     },
   },
