@@ -29,9 +29,9 @@ export function initializeFirebase() {
 export function getSdks(firebaseApp: FirebaseApp) {
   return {
     firebaseApp,
-    // Note: getAuth() is kept for other potential Firebase services that might need it,
-    // but it is not used for user login/signup in the custom auth flow.
     auth: getAuth(firebaseApp), 
     firestore: getFirestore(firebaseApp)
   };
 }
+
+    

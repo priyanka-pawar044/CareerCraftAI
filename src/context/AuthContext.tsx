@@ -3,88 +3,111 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { 
+  getAuth, 
+  onAuthStateChanged, 
+  signOut, 
+  GoogleAuthProvider, 
+  GithubAuthProvider, 
+  signInWithPopup, 
+  User as FirebaseUser 
+} from 'firebase/auth';
+import { initializeFirebase } from '@/firebase';
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
+interface AppUser {
+  uid: string;
+  email: string | null;
+  displayName: string | null;
+  photoURL: string | null;
 }
 
 interface AuthContextType {
-  user: User | null;
+  user: AppUser | null;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  signup: (name: string, email: string, password: string) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
+  signInWithGitHub: () => Promise<void>;
   logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AppUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+  const { auth, firestore } = initializeFirebase();
+
+  const handleUser = async (firebaseUser: FirebaseUser | null) => {
+    if (firebaseUser) {
+      const { uid, email, displayName, photoURL } = firebaseUser;
+      const appUser: AppUser = { uid, email, displayName, photoURL };
+      
+      // Check if user exists in Firestore, if not, create them
+      const userRef = doc(firestore, 'users', uid);
+      const userSnap = await getDoc(userRef);
+      if (!userSnap.exists()) {
+        try {
+          await setDoc(userRef, {
+            id: uid,
+            name: displayName,
+            email: email,
+            authProvider: firebaseUser.providerData[0]?.providerId || 'unknown',
+            lastLogin: serverTimestamp(),
+            createdAt: serverTimestamp(),
+          });
+        } catch (error) {
+          console.error("Error creating user document:", error);
+          toast({ variant: 'destructive', title: 'Database Error', description: 'Could not save user profile.' });
+        }
+      } else {
+        // Optionally update last login time for existing users
+        try {
+            await setDoc(userRef, { lastLogin: serverTimestamp() }, { merge: true });
+        } catch(error) {
+            console.error("Error updating last login:", error);
+        }
+      }
+      
+      setUser(appUser);
+      setIsLoading(false);
+      return appUser;
+    } else {
+      setUser(null);
+      setIsLoading(false);
+      return null;
+    }
+  };
 
   useEffect(() => {
-    // Check for a user session on initial load
-    const checkUserSession = async () => {
-      try {
-        const res = await fetch('/api/auth/session');
-        if (res.ok) {
-          const { user } = await res.json();
-          setUser(user);
-        }
-      } catch (error) {
-        console.error('Failed to fetch user session', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    checkUserSession();
-  }, []);
+    const unsubscribe = onAuthStateChanged(auth, handleUser);
+    return () => unsubscribe();
+  }, [auth]);
 
-  const login = async (email: string, password: string) => {
-    const res = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
-
-    const data = await res.json();
-    if (!res.ok) {
-      throw new Error(data.message || 'Login failed');
+  const socialSignIn = async (provider: GoogleAuthProvider | GithubAuthProvider) => {
+    try {
+      await signInWithPopup(auth, provider);
+    } catch (error: any) {
+      console.error("Social sign in error", error);
+      throw new Error(error.message || `Failed to sign in with ${provider.providerId}.`);
     }
-    setUser(data.user);
-    toast({ title: 'Success', description: 'Logged in successfully.' });
   };
-
-  const signup = async (name: string, email: string, password: string) => {
-    const res = await fetch('/api/auth/signup', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, password }),
-    });
-
-    const data = await res.json();
-    if (!res.ok) {
-      throw new Error(data.message || 'Signup failed');
-    }
-    setUser(data.user);
-    toast({ title: 'Success', description: 'Account created successfully.' });
-  };
+  
+  const signInWithGoogle = () => socialSignIn(new GoogleAuthProvider());
+  const signInWithGitHub = () => socialSignIn(new GithubAuthProvider());
 
   const logout = async () => {
     try {
-        await fetch('/api/auth/logout', { method: 'POST' });
-        setUser(null);
-        toast({ title: 'Success', description: 'Logged out successfully.' });
+      await signOut(auth);
+      // handleUser(null) will be called by onAuthStateChanged
+      toast({ title: 'Success', description: 'Logged out successfully.' });
     } catch (error) {
-        toast({ variant: 'destructive', title: 'Error', description: 'Logout failed.' });
+      toast({ variant: 'destructive', title: 'Error', description: 'Logout failed.' });
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, signup, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, logout, signInWithGoogle, signInWithGitHub }}>
       {children}
     </AuthContext.Provider>
   );
@@ -97,3 +120,5 @@ export function useAuth() {
   }
   return context;
 }
+
+    
