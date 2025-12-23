@@ -149,6 +149,15 @@ service cloud.firestore {
       }
 
       /**
+       * @description Controls access to a user's interview preferences.
+       * @path /users/{userId}/preferences/{docId}
+       * @allow A signed-in user can read and write their own preferences.
+       */
+      match /preferences/{docId} {
+         allow read, write: if isOwner(userId);
+      }
+      
+      /**
        * @description Controls access to a user's interview session documents.
        * @path /users/{userId}/interviewSessions/{interviewSessionId}
        * @allow A signed-in user (auth.uid='user123') can (create) a new session at /users/user123/interviewSessions/sessionABC.
@@ -158,8 +167,8 @@ service cloud.firestore {
       match /interviewSessions/{interviewSessionId} {
         allow get: if isOwner(userId);
         allow list: if isOwner(userId);
-        allow create: if isOwner(userId) && hasCorrectUserIdOnCreate(userId);
-        allow update: if isExistingOwner(userId) && isUserIdImmutable();
+        allow create: if isOwner(userId);
+        allow update: if isExistingOwner(userId);
         allow delete: if isExistingOwner(userId);
 
         /**

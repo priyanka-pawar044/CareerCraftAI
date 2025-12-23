@@ -40,6 +40,7 @@ import {
   addDoc,
   doc,
   setDoc,
+  getDoc,
   serverTimestamp,
 } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
@@ -56,6 +57,9 @@ const jobRoles = [
   'Data Analyst',
   'DevOps',
   'Cloud Engineer',
+  'Frontend',
+  'Backend',
+  'Full Stack',
 ];
 
 type Evaluation = AiMockInterviewEvaluationOutput & {
@@ -81,13 +85,37 @@ export default function MockInterviewPage() {
   const [interviewSessionId, setInterviewSessionId] = useState<string | null>(
     null
   );
+  const [isFetchingPrefs, setIsFetchingPrefs] = useState(true);
 
   const [timeLeft, setTimeLeft] = useState(QUESTION_TIME_LIMIT);
+  
+  useEffect(() => {
+    async function fetchPreferences() {
+      if (user) {
+        setIsFetchingPrefs(true);
+        const prefRef = doc(firestore, 'users', user.uid, 'preferences', 'settings');
+        const prefSnap = await getDoc(prefRef);
+        if (prefSnap.exists()) {
+          const prefs = prefSnap.data();
+          if (prefs.role) {
+            setJobRole(prefs.role);
+          }
+        }
+        setIsFetchingPrefs(false);
+      } else {
+        setIsFetchingPrefs(false);
+      }
+    }
+    fetchPreferences();
+  }, [user, firestore]);
 
   const submitAnswer = useCallback(async () => {
     if (!currentAnswer) {
-      setError('Please provide an answer.');
-      return;
+      // Don't error if timer runs out with no answer, just move on
+      if (timeLeft > 0) {
+        setError('Please provide an answer.');
+        return;
+      }
     }
     if (!user || !interviewSessionId) return;
 
@@ -99,13 +127,13 @@ export default function MockInterviewPage() {
       const result = await aiMockInterviewEvaluation({
         jobRole,
         question: questions[currentQuestionIndex],
-        answer: currentAnswer,
+        answer: currentAnswer || "No answer provided.",
       });
 
       const newEvaluation = {
         ...result,
         question: questions[currentQuestionIndex],
-        answer: currentAnswer,
+        answer: currentAnswer || "No answer provided.",
       };
 
       // Save question and evaluation to Firestore
@@ -120,10 +148,13 @@ export default function MockInterviewPage() {
         )
       );
       await setDoc(questionRef, {
-        ...newEvaluation,
         interviewSessionId: interviewSessionId,
         questionText: newEvaluation.question,
         userAnswer: newEvaluation.answer,
+        correctnessScore: newEvaluation.correctnessScore,
+        clarityScore: newEvaluation.clarityScore,
+        confidenceScore: newEvaluation.confidenceScore,
+        modelAnswer: newEvaluation.modelAnswer,
         improvementSuggestions: newEvaluation.suggestions,
         createdAt: serverTimestamp(),
       });
@@ -163,6 +194,7 @@ export default function MockInterviewPage() {
     user,
     interviewSessionId,
     firestore,
+    timeLeft
   ]);
 
   useEffect(() => {
@@ -191,14 +223,13 @@ export default function MockInterviewPage() {
           jobRole: jobRole,
           startTime: serverTimestamp(),
           endTime: null,
-          questionIds: [],
         }
       );
       setInterviewSessionId(sessionRef.id);
 
       const { questions: generatedQuestions } =
         await generateRoleBasedInterviewQuestions({ jobRole });
-      setQuestions(generatedQuestions);
+      setQuestions(generatedQuestions.slice(0, 5)); // Limit to 5 questions for now
       setCurrentQuestionIndex(0);
       setEvaluations([]);
       setInterviewState('interviewing');
@@ -211,7 +242,7 @@ export default function MockInterviewPage() {
 
   const restartInterview = () => {
     setInterviewState('setup');
-    setJobRole('');
+    // Keep jobRole from prefs
     setQuestions([]);
     setCurrentQuestionIndex(0);
     setCurrentAnswer('');
@@ -224,10 +255,23 @@ export default function MockInterviewPage() {
   const viewHistory = () => {
     if (interviewSessionId) {
       router.push(`/dashboard/history/${interviewSessionId}`);
+    } else {
+      router.push('/dashboard/history');
     }
   };
 
   const renderContent = () => {
+    if (isFetchingPrefs) {
+       return (
+          <Card className="flex flex-col items-center justify-center p-8 space-y-4">
+            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            <p className="text-muted-foreground">
+              Loading preferences...
+            </p>
+          </Card>
+        );
+    }
+
     switch (interviewState) {
       case 'setup':
         return (
@@ -235,7 +279,7 @@ export default function MockInterviewPage() {
             <CardHeader>
               <CardTitle>AI Mock Interview Simulator</CardTitle>
               <CardDescription>
-                Select a job role to start your practice interview.
+                Select a job role to start your practice interview. Your default preferences are pre-selected.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -276,7 +320,7 @@ export default function MockInterviewPage() {
       case 'interviewing':
       case 'evaluating':
         const isEvaluating = interviewState === 'evaluating';
-        const progress = (currentQuestionIndex / questions.length) * 100;
+        const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
         const minutes = Math.floor(timeLeft / 60);
         const seconds = timeLeft % 60;
         const timerColor =
@@ -335,6 +379,7 @@ export default function MockInterviewPage() {
 
       case 'results':
         const avgScore =
+          evaluations.length > 0 ?
           evaluations.reduce(
             (acc, curr) =>
               acc +
@@ -342,7 +387,7 @@ export default function MockInterviewPage() {
               curr.clarityScore +
               curr.confidenceScore,
             0
-          ) / (evaluations.length * 3);
+          ) / (evaluations.length * 3) : 0;
         return (
           <div className="space-y-6">
             <Card className="text-center">

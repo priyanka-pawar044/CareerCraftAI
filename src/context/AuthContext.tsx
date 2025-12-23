@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { 
   getAuth, 
@@ -10,7 +10,8 @@ import {
   GoogleAuthProvider, 
   GithubAuthProvider, 
   signInWithPopup, 
-  User as FirebaseUser 
+  User as FirebaseUser,
+  updateProfile,
 } from 'firebase/auth';
 import { initializeFirebase } from '@/firebase';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
@@ -28,6 +29,7 @@ interface AuthContextType {
   signInWithGoogle: () => Promise<void>;
   signInWithGitHub: () => Promise<void>;
   logout: () => Promise<void>;
+  refreshUser: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -38,12 +40,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
   const { auth, firestore } = initializeFirebase();
 
-  const handleUser = async (firebaseUser: FirebaseUser | null) => {
+  const handleUser = useCallback(async (firebaseUser: FirebaseUser | null) => {
     if (firebaseUser) {
       const { uid, email, displayName, photoURL } = firebaseUser;
       const appUser: AppUser = { uid, email, displayName, photoURL };
       
-      // Check if user exists in Firestore, if not, create them
       const userRef = doc(firestore, 'users', uid);
       const userSnap = await getDoc(userRef);
       if (!userSnap.exists()) {
@@ -61,7 +62,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           toast({ variant: 'destructive', title: 'Database Error', description: 'Could not save user profile.' });
         }
       } else {
-        // Optionally update last login time for existing users
         try {
             await setDoc(userRef, { lastLogin: serverTimestamp() }, { merge: true });
         } catch(error) {
@@ -77,12 +77,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(false);
       return null;
     }
-  };
+  }, [firestore, toast]);
+  
+  const refreshUser = useCallback(() => {
+    const currentUser = auth.currentUser;
+    if (currentUser) {
+       handleUser(currentUser);
+    }
+  }, [auth, handleUser]);
+
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, handleUser);
     return () => unsubscribe();
-  }, [auth]);
+  }, [auth, handleUser]);
 
   const socialSignIn = async (provider: GoogleAuthProvider | GithubAuthProvider) => {
     try {
@@ -107,7 +115,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, logout, signInWithGoogle, signInWithGitHub }}>
+    <AuthContext.Provider value={{ user, isLoading, logout, signInWithGoogle, signInWithGitHub, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );
@@ -120,5 +128,3 @@ export function useAuth() {
   }
   return context;
 }
-
-    

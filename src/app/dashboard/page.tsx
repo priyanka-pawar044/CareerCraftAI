@@ -14,10 +14,12 @@ import {
   Target,
   ArrowRight,
   History,
+  Settings,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
+import { useEffect } from 'react';
 
 const features = [
   {
@@ -62,11 +64,24 @@ const features = [
     color: 'text-pink-500',
     bgColor: 'bg-pink-100 dark:bg-pink-900/20',
   },
+  {
+    title: 'Settings',
+    description: 'Manage your profile and account preferences.',
+    icon: Settings,
+    href: '/dashboard/settings',
+    color: 'text-gray-500',
+    bgColor: 'bg-gray-100 dark:bg-gray-900/20',
+  },
 ];
 
 export default function DashboardPage() {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const userName = user?.displayName?.split(' ')[0] || 'there';
+  
+  useEffect(() => {
+    refreshUser();
+  }, [refreshUser]);
+
 
   return (
     <div className="space-y-8">

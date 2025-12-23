@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { Logo } from '@/components/icons';
 import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation';
 
 const navItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -44,9 +45,11 @@ const navItems = [
 export function AppSidebar() {
   const pathname = usePathname();
   const { logout } = useAuth();
+  const router = useRouter();
 
   const handleLogout = async () => {
     await logout();
+    router.push('/login');
   };
 
   return (
