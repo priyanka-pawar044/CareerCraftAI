@@ -15,3 +15,5 @@ export function fileToDataUri(file: File): Promise<string> {
     reader.readAsDataURL(file);
   });
 }
+
+    

@@ -109,3 +109,5 @@ export function useCollection<T = any>(
   }, [memoizedTargetRefOrQuery]); // Re-run if the target query/reference changes.
   return { data, isLoading, error };
 }
+
+    

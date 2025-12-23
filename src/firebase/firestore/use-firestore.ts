@@ -6,3 +6,5 @@ export const useFirestore = (): Firestore | null => {
   const firebase = useFirebase();
   return firebase?.firestore ?? null;
 };
+
+    
