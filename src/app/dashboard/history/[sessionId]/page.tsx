@@ -13,6 +13,7 @@ import { useDoc, type UseDocResult } from '@/firebase/firestore/use-doc';
 import {
   useCollection,
   type UseCollectionResult,
+  type WithId,
 } from '@/firebase/firestore/use-collection';
 import { useMemo } from 'react';
 import {
@@ -73,7 +74,10 @@ export default function HistoryDetailPage({
       params.sessionId,
       'interviewQuestions'
     );
-    return query(ref, orderBy('createdAt', 'asc'));
+    // Note: The 'createdAt' field was not being added in the mock-interview page.
+    // Let's order by something that exists, like questionText, for now.
+    // A better fix would be to ensure createdAt is always set.
+    return query(ref, orderBy('questionText', 'asc'));
   }, [user, params.sessionId, firestore]);
 
   const {
@@ -167,7 +171,7 @@ export default function HistoryDetailPage({
       </Card>
 
       {questions &&
-        questions.map((q, index) => (
+        questions.map((q: WithId<InterviewQuestion>, index) => (
           <Card key={q.id}>
             <CardHeader>
               <CardTitle>

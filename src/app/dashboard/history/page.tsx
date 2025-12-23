@@ -87,7 +87,7 @@ export default function HistoryPage() {
 
     return (
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {sessions.map((session) => (
+        {sessions.map((session: WithId<InterviewSession>) => (
           <Card key={session.id} className="flex flex-col">
             <CardHeader>
               <CardTitle>{session.jobRole} Interview</CardTitle>
