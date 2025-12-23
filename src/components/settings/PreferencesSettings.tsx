@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect } from 'react';
@@ -85,7 +86,7 @@ export function PreferencesSettings() {
     
     try {
       const prefRef = doc(firestore, 'users', user.uid, 'preferences', 'settings');
-      await setDoc(prefRef, data);
+      await setDoc(prefRef, data, { merge: true });
       toast({
         title: 'Preferences saved',
         description: 'Your interview preferences have been updated.',
@@ -103,14 +104,14 @@ export function PreferencesSettings() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 max-w-lg">
         <FormField
           control={form.control}
           name="role"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Preferred Role</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+              <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select a preferred role" />
@@ -139,7 +140,7 @@ export function PreferencesSettings() {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Difficulty Level</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+              <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select a difficulty" />
@@ -164,7 +165,7 @@ export function PreferencesSettings() {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Default Interview Duration (minutes)</FormLabel>
-              <Select onValueChange={(value) => field.onChange(Number(value))} value={String(field.value)} defaultValue={String(field.value)}>
+              <Select onValueChange={(value) => field.onChange(Number(value))} value={String(field.value)}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select a duration" />

@@ -24,10 +24,8 @@ import {
   aiMockInterviewEvaluation,
   AiMockInterviewEvaluationOutput,
 } from '@/ai/flows/ai-mock-interview-evaluation';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import {
   Loader2,
-  Terminal,
   ChevronLeft,
   CheckCircle,
   BrainCircuit,
@@ -112,12 +110,9 @@ export default function MockInterviewPage() {
   }, [user, firestore]);
 
   const submitAnswer = useCallback(async () => {
-    if (!currentAnswer) {
-      // Don't error if timer runs out with no answer, just move on
-      if (timeLeft > 0) {
+    if (!currentAnswer && timeLeft > 0) {
         setError('Please provide an answer.');
         return;
-      }
     }
     if (!user || !interviewSessionId) return;
 
@@ -170,7 +165,6 @@ export default function MockInterviewPage() {
         setTimeLeft(QUESTION_TIME_LIMIT); // Reset timer for next question
       } else {
         setInterviewState('results');
-        // Update interview session with end time
         const sessionRef = doc(
           firestore,
           'users',
@@ -217,7 +211,6 @@ export default function MockInterviewPage() {
     setError(null);
     setInterviewState('generating');
     try {
-      // Create a new interview session in Firestore
       const sessionRef = await addDoc(
         collection(firestore, 'users', user.uid, 'interviewSessions'),
         {
@@ -231,7 +224,7 @@ export default function MockInterviewPage() {
 
       const { questions: generatedQuestions } =
         await generateRoleBasedInterviewQuestions({ jobRole });
-      setQuestions(generatedQuestions.slice(0, 5)); // Limit to 5 questions for now
+      setQuestions(generatedQuestions.slice(0, 5)); // Limit to 5 questions
       setCurrentQuestionIndex(0);
       setEvaluations([]);
       setInterviewState('interviewing');
@@ -244,7 +237,6 @@ export default function MockInterviewPage() {
 
   const restartInterview = () => {
     setInterviewState('setup');
-    // Keep jobRole from prefs
     setQuestions([]);
     setCurrentQuestionIndex(0);
     setCurrentAnswer('');
@@ -265,10 +257,10 @@ export default function MockInterviewPage() {
   const renderContent = () => {
     if (isFetchingPrefs) {
        return (
-          <Card className="flex flex-col items-center justify-center p-8 space-y-4">
+          <Card className="flex flex-col items-center justify-center p-8 space-y-4 min-h-[400px]">
             <Loader2 className="h-12 w-12 animate-spin text-primary" />
             <p className="text-muted-foreground">
-              Loading preferences...
+              Loading your preferences...
             </p>
           </Card>
         );
@@ -311,7 +303,7 @@ export default function MockInterviewPage() {
 
       case 'generating':
         return (
-          <Card className="flex flex-col items-center justify-center p-8 space-y-4">
+          <Card className="flex flex-col items-center justify-center p-8 space-y-4 min-h-[400px]">
             <Loader2 className="h-12 w-12 animate-spin text-primary" />
             <p className="text-muted-foreground">
               Generating your interview questions...
@@ -325,19 +317,18 @@ export default function MockInterviewPage() {
         const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
         const minutes = Math.floor(timeLeft / 60);
         const seconds = timeLeft % 60;
-        const timerColor =
-          timeLeft <= 30 ? 'text-destructive' : 'text-foreground';
+        const timerColor = timeLeft <= 30 ? 'text-destructive' : 'text-foreground';
 
         return (
           <Card>
             <CardHeader>
-              <div className="flex justify-between items-start">
+              <div className="flex justify-between items-start flex-wrap gap-4">
                 <div>
                   <CardTitle>
                     Question {currentQuestionIndex + 1} of {questions.length}
                   </CardTitle>
-                  <CardDescription className="font-semibold text-lg text-foreground mt-2">
-                    {questions[currentQuestionIndex]}
+                  <CardDescription className="mt-1">
+                    Role: {jobRole}
                   </CardDescription>
                 </div>
                 <div
@@ -350,10 +341,13 @@ export default function MockInterviewPage() {
               </div>
               <Progress value={progress} className="mt-4" />
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-6">
+                <p className="font-semibold text-lg text-foreground mt-2 bg-muted p-6 rounded-lg">
+                    {questions[currentQuestionIndex]}
+                </p>
               <Textarea
                 placeholder="Your answer..."
-                className="min-h-[200px]"
+                className="min-h-[200px] text-base"
                 value={currentAnswer}
                 onChange={(e) => setCurrentAnswer(e.target.value)}
                 disabled={isEvaluating}
@@ -366,6 +360,7 @@ export default function MockInterviewPage() {
               <Button
                 onClick={submitAnswer}
                 disabled={isEvaluating || !currentAnswer}
+                size="lg"
               >
                 {isEvaluating ? (
                   <>

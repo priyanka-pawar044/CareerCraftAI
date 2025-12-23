@@ -98,22 +98,22 @@ export default function DashboardPage() {
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {features.map((feature) => (
-          <Card key={feature.title} className="flex flex-col">
-            <CardHeader className="flex flex-row items-center gap-4">
+          <Card key={feature.title} className="flex flex-col hover:shadow-lg transition-shadow duration-300">
+            <CardHeader className="flex flex-row items-start gap-4">
               <div className={`rounded-lg p-3 ${feature.bgColor}`}>
                 <feature.icon className={`h-6 w-6 ${feature.color}`} />
               </div>
-              <div>
-                <CardTitle>{feature.title}</CardTitle>
-                <CardDescription>{feature.description}</CardDescription>
+              <div className='flex-1'>
+                <CardTitle className="text-lg">{feature.title}</CardTitle>
+                <CardDescription className="mt-1">{feature.description}</CardDescription>
               </div>
             </CardHeader>
-            <CardContent className="flex-grow flex items-end justify-end">
-              <Link href={feature.href} className="w-full">
-                <Button variant="outline" className="w-full">
-                  Get Started <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
+            <CardContent className="flex-grow flex items-end justify-end pt-4">
+              <Button asChild variant="ghost" className="w-full justify-end text-primary hover:text-primary">
+                <Link href={feature.href}>
+                  Go to {feature.title} <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
             </CardContent>
           </Card>
         ))}

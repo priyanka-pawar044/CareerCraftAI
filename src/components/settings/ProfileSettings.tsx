@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useForm } from 'react-hook-form';
@@ -23,13 +24,13 @@ import { doc, setDoc } from 'firebase/firestore';
 import { updateProfile } from 'firebase/auth';
 
 const profileFormSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters.'),
+  name: z.string().min(2, 'Name must be at least 2 characters.').max(50, 'Name cannot be longer than 50 characters.'),
 });
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 export function ProfileSettings() {
-  const { user, isLoading: isAuthLoading } = useAuth();
+  const { user, isLoading: isAuthLoading, refreshUser } = useAuth();
   const { auth, firestore } = initializeFirebase();
   const { toast } = useToast();
 
@@ -61,8 +62,8 @@ export function ProfileSettings() {
       const userRef = doc(firestore, 'users', auth.currentUser.uid);
       await setDoc(userRef, { name: data.name }, { merge: true });
       
-      // Manually trigger re-render in auth context is tricky, usually a page reload or state lift is needed
-      // For now, we can just show a success message. The AuthProvider will pick it up on next load.
+      refreshUser();
+
       toast({
         title: 'Profile updated',
         description: 'Your name has been successfully updated.',
@@ -83,7 +84,7 @@ export function ProfileSettings() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-lg">
         <FormField
           control={form.control}
           name="name"
@@ -94,12 +95,11 @@ export function ProfileSettings() {
                 <Input
                   placeholder="Your name"
                   {...field}
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || isAuthLoading}
                 />
               </FormControl>
               <FormDescription>
-                This is the name that will be displayed on your profile and in
-                emails.
+                This is the name that will be displayed on your profile.
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -108,9 +108,9 @@ export function ProfileSettings() {
         <div className="space-y-2">
           <Label>Email</Label>
           <Input value={user?.email || 'Loading...'} readOnly disabled />
-          <p className="text-[0.8rem] text-muted-foreground">
+          <FormDescription>
             You cannot change your email address.
-          </p>
+          </FormDescription>
         </div>
         <div className="space-y-2">
           <Label>Login Provider</Label>
@@ -120,9 +120,9 @@ export function ProfileSettings() {
             disabled
           />
         </div>
-        <Button type="submit" disabled={isSubmitting || !isDirty}>
+        <Button type="submit" disabled={isSubmitting || !isDirty || isAuthLoading}>
           {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Update profile
+          Update Profile
         </Button>
       </form>
     </Form>

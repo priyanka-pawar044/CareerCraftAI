@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -43,28 +44,28 @@ export function AccountSettings() {
     
     try {
       const userId = user.uid;
-      
-      // 1. Delete all subcollections recursively (interview history etc.)
-      const interviewSessionsRef = collection(firestore, 'users', userId, 'interviewSessions');
-      const sessionsSnapshot = await getDocs(interviewSessionsRef);
       const batch = writeBatch(firestore);
 
-      for (const sessionDoc of sessionsSnapshot.docs) {
-        const questionsRef = collection(sessionDoc.ref, 'interviewQuestions');
-        const questionsSnapshot = await getDocs(questionsRef);
-        questionsSnapshot.forEach(questionDoc => batch.delete(questionDoc.ref));
-        batch.delete(sessionDoc.ref);
+      // 1. Delete all subcollections (interview history etc.)
+      const collectionsToDelete = ['interviewSessions', 'skillGapAnalyses', 'jobDescriptionAnalyses', 'resumes'];
+      for (const subcollection of collectionsToDelete) {
+          const subcollectionRef = collection(firestore, 'users', userId, subcollection);
+          const snapshot = await getDocs(subcollectionRef);
+          snapshot.forEach(doc => {
+            batch.delete(doc.ref);
+          });
       }
       
       // Delete preferences
       const prefRef = doc(firestore, 'users', userId, 'preferences', 'settings');
       batch.delete(prefRef);
       
-      await batch.commit();
-
       // 2. Delete the user document itself
       const userDocRef = doc(firestore, 'users', userId);
-      await deleteDoc(userDocRef);
+      batch.delete(userDocRef);
+
+      // Commit all Firestore deletions
+      await batch.commit();
       
       // 3. Delete the Firebase Auth user
       await deleteUser(auth.currentUser);
@@ -75,15 +76,16 @@ export function AccountSettings() {
     } catch (error: any) {
       console.error("Account deletion error:", error);
       toast({ variant: 'destructive', title: 'Deletion failed', description: error.message || 'An error occurred while deleting your account. You may need to re-authenticate.' });
+    } finally {
       setIsDeleting(false);
     }
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-lg">
       <div className="flex items-center justify-between rounded-lg border p-4">
           <div>
-            <h3 className="text-lg font-medium">Log Out</h3>
+            <h3 className="font-medium">Log Out</h3>
             <p className="text-sm text-muted-foreground">
                 End your current session on this browser.
             </p>
@@ -95,9 +97,9 @@ export function AccountSettings() {
       </div>
       <div className="flex items-center justify-between rounded-lg border border-destructive/50 p-4">
           <div>
-            <h3 className="text-lg font-medium text-destructive">Delete Account</h3>
+            <h3 className="font-medium text-destructive">Delete Account</h3>
             <p className="text-sm text-muted-foreground">
-                Permanently delete your account and all of your content. This action is irreversible.
+                Permanently delete your account and all your content. This action is irreversible.
             </p>
           </div>
           <AlertDialog>

@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -24,6 +25,7 @@ import {
 import { Logo } from '@/components/icons';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import { APP_NAME } from '@/lib/constants';
 
 const navItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -60,7 +62,7 @@ export function AppSidebar() {
             <Logo className="h-6 w-6" />
           </div>
           <span className="text-lg font-semibold text-primary">
-            CareerPilot AI
+            {APP_NAME}
           </span>
         </div>
       </SidebarHeader>
