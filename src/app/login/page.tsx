@@ -8,6 +8,7 @@ import { redirect } from 'next/navigation';
 import { useEffect } from 'react';
 import { Github, Loader2 } from 'lucide-react';
 import { GoogleIcon, TechLogos } from '@/components/icons/TechLogos';
+import { APP_NAME, APP_TAGLINE } from '@/lib/constants';
 
 export default function LoginPage() {
   const { user, isLoading, signInWithGoogle, signInWithGitHub } = useAuth();
@@ -59,10 +60,10 @@ export default function LoginPage() {
       <div className="relative z-10 w-full max-w-sm rounded-xl bg-card/80 shadow-2xl shadow-primary/10 backdrop-blur-lg">
         <div className="flex flex-col items-center justify-center p-8 text-center">
           <h1 className="text-3xl font-bold tracking-tight text-foreground">
-            CareerPilot AI
+            {APP_NAME}
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Sign in to start your journey
+            {APP_TAGLINE}
           </p>
         </div>
         <div className="p-8 pt-0">
@@ -88,4 +89,3 @@ export default function LoginPage() {
     </div>
   );
 }
-    

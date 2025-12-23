@@ -45,6 +45,7 @@ import {
   serverTimestamp,
 } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
+import { APP_TAGLINE } from '@/lib/constants';
 
 type InterviewState =
   | 'setup'
@@ -280,7 +281,7 @@ export default function MockInterviewPage() {
             <CardHeader>
               <CardTitle>AI Mock Interview Simulator</CardTitle>
               <CardDescription>
-                Select a job role to start your practice interview. Your default preferences are pre-selected.
+                {APP_TAGLINE}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -477,5 +478,3 @@ export default function MockInterviewPage() {
 
   return <div className="max-w-4xl mx-auto">{renderContent()}</div>;
 }
-
-    

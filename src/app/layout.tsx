@@ -5,13 +5,13 @@ import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
 import { Inter } from 'next/font/google';
 import { AuthProvider } from '@/context/AuthContext';
+import { APP_NAME, APP_TAGLINE, APP_META_DESCRIPTION } from '@/lib/constants';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
-  title: 'CareerPilot AI',
-  description:
-    'AI-powered platform that helps students prepare for job interviews and placements.',
+  title: `${APP_NAME} – ${APP_TAGLINE}`,
+  description: APP_META_DESCRIPTION,
 };
 
 export default function RootLayout({

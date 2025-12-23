@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -20,6 +21,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 import { useEffect } from 'react';
+import { APP_NAME, APP_TAGLINE } from '@/lib/constants';
 
 const features = [
   {
@@ -90,7 +92,7 @@ export default function DashboardPage() {
           Welcome, {userName} 👋
         </h1>
         <p className="text-muted-foreground">
-          Here's your personal hub for career preparation. Let's get you hired.
+          <span className="font-semibold text-primary">{APP_NAME}</span> - {APP_TAGLINE}
         </p>
       </div>
 

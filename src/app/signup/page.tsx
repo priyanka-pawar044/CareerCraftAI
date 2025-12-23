@@ -8,9 +8,10 @@ import { useEffect, useState } from 'react';
 import { Github, Loader2 } from 'lucide-react';
 import { GoogleIcon, TechLogos } from '@/components/icons/TechLogos';
 import Link from 'next/link';
+import { APP_NAME, APP_TAGLINE } from '@/lib/constants';
 
 export default function SignupPage() {
-  const { user, isLoading: isAuthLoading } = useAuth();
+  const { user, isLoading: isAuthLoading, signInWithGoogle, signInWithGitHub } = useAuth();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -19,13 +20,31 @@ export default function SignupPage() {
     }
   }, [user]);
 
-  const handleGoogleSignIn = () => {
-    toast({ title: "Coming Soon!", description: "Google Sign-In will be available soon." });
-  }
+   const handleGoogleSignIn = async () => {
+    try {
+      await signInWithGoogle();
+      toast({ title: 'Success', description: 'Signed in with Google.' });
+    } catch (error: any) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: error.message || 'Failed to sign in with Google.',
+      });
+    }
+  };
 
-  const handleGitHubSignIn = () => {
-    toast({ title: "Coming Soon!", description: "GitHub Sign-In will be available soon." });
-  }
+  const handleGitHubSignIn = async () => {
+    try {
+      await signInWithGitHub();
+      toast({ title: 'Success', description: 'Signed in with GitHub.' });
+    } catch (error: any) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: error.message || 'Failed to sign in with GitHub.',
+      });
+    }
+  };
 
   if (isAuthLoading || user) {
     return (
@@ -41,9 +60,9 @@ export default function SignupPage() {
       <div className="z-10 w-full max-w-md">
         <div className="rounded-xl border border-border bg-card shadow-lg">
           <div className="p-8 text-center">
-             <h1 className="text-3xl font-bold text-foreground">Get Started</h1>
+             <h1 className="text-3xl font-bold text-foreground">{APP_NAME}</h1>
             <p className="mt-2 text-muted-foreground">
-              Create an account to start your journey with CareerPilot AI.
+              {APP_TAGLINE}
             </p>
           </div>
           <div className="p-8 pt-0">

@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -16,6 +17,7 @@ import {
 import { ProfileSettings } from '@/components/settings/ProfileSettings';
 import { PreferencesSettings } from '@/components/settings/PreferencesSettings';
 import { AccountSettings } from '@/components/settings/AccountSettings';
+import { APP_NAME, APP_TAGLINE } from '@/lib/constants';
 
 export default function SettingsPage() {
   return (
@@ -23,7 +25,7 @@ export default function SettingsPage() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
         <p className="text-muted-foreground">
-          Manage your account settings and set e-mail preferences.
+           <span className="font-semibold text-primary">{APP_NAME}</span> - {APP_TAGLINE}
         </p>
       </div>
 
