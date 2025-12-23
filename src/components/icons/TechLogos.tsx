@@ -4,71 +4,71 @@ import { SVGProps, useId } from "react";
 import { cn } from "@/lib/utils";
 
 // This file contains the SVG components for the decorative logos on the login page.
-
 export function TechLogos() {
   const id = useId();
 
   const logos = [
     // DevOps & Containerization
-    { component: Docker, className: "w-12 h-12", style: { top: '10%', left: '15%', animation: 'float 12s ease-in-out infinite' } },
-    { component: Kubernetes, className: "w-10 h-10", style: { top: '15%', right: '10%', animation: 'float-reverse 10s ease-in-out infinite' } },
-    { component: Openshift, className: "w-11 h-11", style: { top: '25%', left: '5%', animation: 'float 14s ease-in-out infinite' } },
-    { component: Jenkins, className: "w-10 h-10", style: { top: '50%', left: '5%', animation: 'float 15s ease-in-out infinite' } },
-    { component: Git, className: "w-11 h-11", style: { top: '35%', right: '5%', animation: 'float-reverse 13s ease-in-out infinite' } },
-    { component: Github, className: "w-9 h-9", style: { top: '5%', left: '50%', animation: 'float 11s ease-in-out infinite' } },
-    { component: Gitlab, className: "w-10 h-10", style: { bottom: '10%', right: '5%', animation: 'float 16s ease-in-out infinite' } },
-    { component: ArgoCD, className: "w-12 h-12", style: { bottom: '5%', left: '20%', animation: 'float-reverse 12s ease-in-out infinite' } },
-    { component: Helm, className: "w-10 h-10", style: { top: '70%', left: '10%', animation: 'float 10s ease-in-out infinite' } },
-
+    { component: Docker, className: "w-12 h-12 text-blue-400", style: { top: '10%', left: '15%', animation: 'float 12s ease-in-out infinite' } },
+    { component: Kubernetes, className: "w-10 h-10 text-blue-500", style: { top: '15%', right: '10%', animation: 'float-reverse 10s ease-in-out infinite' } },
+    { component: Openshift, className: "w-11 h-11 text-red-500", style: { top: '25%', left: '5%', animation: 'float 14s ease-in-out infinite' } },
+    { component: Jenkins, className: "w-10 h-10 text-gray-500", style: { top: '50%', left: '5%', animation: 'float 15s ease-in-out infinite' } },
+    { component: Git, className: "w-11 h-11 text-red-600", style: { top: '35%', right: '5%', animation: 'float-reverse 13s ease-in-out infinite' } },
+    { component: Github, className: "w-9 h-9 text-gray-800", style: { top: '5%', left: '50%', animation: 'float 11s ease-in-out infinite' } },
+    { component: Gitlab, className: "w-10 h-10 text-orange-500", style: { bottom: '10%', right: '5%', animation: 'float 16s ease-in-out infinite' } },
+    { component: ArgoCD, className: "w-12 h-12 text-orange-600", style: { bottom: '5%', left: '20%', animation: 'float-reverse 12s ease-in-out infinite' } },
+    { component: Helm, className: "w-10 h-10 text-blue-600", style: { top: '70%', left: '10%', animation: 'float 10s ease-in-out infinite' } },
+    
     // Cloud & Infrastructure
-    { component: Aws, className: "w-12 h-12", style: { top: '70%', right: '5%', animation: 'float 16s ease-in-out infinite' } },
-    { component: Gcp, className: "w-10 h-10", style: { top: '5%', right: '30%', animation: 'float 12s ease-in-out infinite' } },
-    { component: Azure, className: "w-10 h-10", style: { bottom: '5%', right: '40%', animation: 'float-reverse 9s ease-in-out infinite' } },
-    { component: DigitalOcean, className: "w-11 h-11", style: { top: '85%', left: '45%', animation: 'float 13s ease-in-out infinite' } },
-    { component: OracleCloud, className: "w-14 h-14", style: { bottom: '15%', left: '30%', animation: 'float-reverse 15s ease-in-out infinite' } },
-    { component: IbmCloud, className: "w-12 h-12", style: { top: '45%', right: '15%', animation: 'float 11s ease-in-out infinite' } },
-
+    { component: Aws, className: "w-12 h-12 text-orange-400", style: { top: '70%', right: '5%', animation: 'float 16s ease-in-out infinite' } },
+    { component: Gcp, className: "w-10 h-10 text-blue-500", style: { top: '5%', right: '30%', animation: 'float 12s ease-in-out infinite' } },
+    { component: Azure, className: "w-10 h-10 text-blue-400", style: { bottom: '5%', right: '40%', animation: 'float-reverse 9s ease-in-out infinite' } },
+    
     // IaC & Config Management
-    { component: Terraform, className: "w-10 h-10", style: { bottom: '10%', left: '20%', animation: 'float 11s ease-in-out infinite' } },
-    { component: Ansible, className: "w-12 h-12", style: { bottom: '20%', right: '15%', animation: 'float-reverse 14s ease-in-out infinite' } },
-    { component: Chef, className: "w-10 h-10", style: { top: '90%', right: '35%', animation: 'float 12s ease-in-out infinite' } },
-    { component: Puppet, className: "w-11 h-11", style: { top: '5%', right: '50%', animation: 'float-reverse 10s ease-in-out infinite' } },
+    { component: Terraform, className: "w-10 h-10 text-purple-600", style: { bottom: '10%', left: '10%', animation: 'float 11s ease-in-out infinite' } },
+    { component: Ansible, className: "w-12 h-12 text-black", style: { bottom: '20%', right: '15%', animation: 'float-reverse 14s ease-in-out infinite' } },
 
     // Operating Systems
-    { component: Linux, className: "w-10 h-10", style: { top: '90%', right: '50%', animation: 'float-reverse 13s ease-in-out infinite' } },
-    { component: Ubuntu, className: "w-10 h-10", style: { top: '30%', left: '30%', animation: 'float 15s ease-in-out infinite' } },
-    { component: RedHat, className: "w-12 h-12", style: { bottom: '25%', right: '45%', animation: 'float 11s ease-in-out infinite' } },
-    { component: Suse, className: "w-14 h-14", style: { top: '75%', right: '40%', animation: 'float-reverse 14s ease-in-out infinite' } },
-    { component: Centos, className: "w-12 h-12", style: { top: '50%', left: '55%', animation: 'float 10s ease-in-out infinite' } },
+    { component: Linux, className: "w-10 h-10 text-yellow-400", style: { top: '90%', right: '50%', animation: 'float-reverse 13s ease-in-out infinite' } },
+    { component: Ubuntu, className: "w-10 h-10 text-orange-600", style: { top: '30%', left: '30%', animation: 'float 15s ease-in-out infinite' } },
+    { component: RedHat, className: "w-12 h-12 text-red-600", style: { bottom: '25%', right: '45%', animation: 'float 11s ease-in-out infinite' } },
 
     // Monitoring & Logging
-    { component: Prometheus, className: "w-10 h-10", style: { bottom: '40%', left: '5%', animation: 'float 13s ease-in-out infinite' } },
-    { component: Grafana, className: "w-9 h-9", style: { top: '60%', left: '25%', animation: 'float-reverse 12s ease-in-out infinite' } },
-    { component: Elasticsearch, className: "w-10 h-10", style: { bottom: '50%', right: '25%', animation: 'float 15s ease-in-out infinite' } },
+    { component: Prometheus, className: "w-10 h-10 text-orange-700", style: { bottom: '40%', left: '5%', animation: 'float 13s ease-in-out infinite' } },
+    { component: Grafana, className: "w-9 h-9 text-orange-500", style: { top: '60%', left: '25%', animation: 'float-reverse 12s ease-in-out infinite' } },
+    { component: Elasticsearch, className: "w-10 h-10 text-teal-500", style: { bottom: '50%', right: '25%', animation: 'float 15s ease-in-out infinite' } },
 
     // Security & Identity
-    { component: Oauth, className: "w-12 h-12", style: { top: '5%', left: '20%', animation: 'float 16s ease-in-out infinite' } },
-    { component: Vault, className: "w-10 h-10", style: { bottom: '50%', left: '35%', animation: 'float-reverse 11s ease-in-out infinite' } },
+    { component: Oauth, className: "w-12 h-12 text-blue-600", style: { top: '5%', left: '20%', animation: 'float 16s ease-in-out infinite' } },
+    { component: Vault, className: "w-10 h-10 text-gray-500", style: { bottom: '50%', left: '35%', animation: 'float-reverse 11s ease-in-out infinite' } },
 
     // Web Development
-    { component: ReactLogo, className: "w-12 h-12", style: { top: '5%', left: '45%', animation: 'float 10s ease-in-out infinite' } },
-    { component: Nodejs, className: "w-10 h-10", style: { top: '35%', right: '20%', animation: 'float 13s ease-in-out infinite' } },
-    { component: Html5, className: "w-10 h-10", style: { bottom: '15%', left: '55%', animation: 'float-reverse 15s ease-in-out infinite' } },
-    { component: Css3, className: "w-10 h-10", style: { top: '60%', right: '25%', animation: 'float 12s ease-in-out infinite' } },
-    { component: Javascript, className: "w-9 h-9", style: { top: '20%', left: '5%', animation: 'float-reverse 13s ease-in-out infinite' } },
-    { component: Typescript, className: "w-9 h-9", style: { bottom: '35%', left: '45%', animation: 'float 14s ease-in-out infinite' } },
+    { component: ReactLogo, className: "w-12 h-12 text-blue-400", style: { top: '5%', left: '45%', animation: 'float 10s ease-in-out infinite' } },
+    { component: Nodejs, className: "w-10 h-10 text-green-500", style: { top: '35%', right: '20%', animation: 'float 13s ease-in-out infinite' } },
+    { component: Html5, className: "w-10 h-10 text-orange-600", style: { bottom: '15%', left: '55%', animation: 'float-reverse 15s ease-in-out infinite' } },
+    { component: Css3, className: "w-10 h-10 text-blue-600", style: { top: '60%', right: '25%', animation: 'float 12s ease-in-out infinite' } },
+    { component: Javascript, className: "w-9 h-9 text-yellow-400", style: { top: '20%', left: '5%', animation: 'float-reverse 13s ease-in-out infinite' } },
+    { component: Typescript, className: "w-9 h-9 text-blue-500", style: { bottom: '35%', left: '45%', animation: 'float 14s ease-in-out infinite' } },
 
     // Databases
-    { component: Mysql, className: "w-12 h-12", style: { bottom: '40%', right: '5%', animation: 'float-reverse 16s ease-in-out infinite' } },
-    { component: Postgresql, className: "w-10 h-10", style: { bottom: '50%', left: '20%', animation: 'float 10s ease-in-out infinite' } },
-    { component: Mongodb, className: "w-12 h-12", style: { top: '65%', left: '15%', animation: 'float-reverse 14s ease-in-out infinite' } },
-    { component: Redis, className: "w-10 h-10", style: { bottom: '60%', right: '10%', animation: 'float 12s ease-in-out infinite' } },
+    { component: Mysql, className: "w-12 h-12 text-blue-600", style: { bottom: '40%', right: '5%', animation: 'float-reverse 16s ease-in-out infinite' } },
+    { component: Postgresql, className: "w-10 h-10 text-blue-700", style: { bottom: '50%', left: '20%', animation: 'float 10s ease-in-out infinite' } },
+    { component: Mongodb, className: "w-12 h-12 text-green-600", style: { top: '65%', left: '15%', animation: 'float-reverse 14s ease-in-out infinite' } },
+    { component: Redis, className: "w-10 h-10 text-red-600", style: { bottom: '60%', right: '10%', animation: 'float 12s ease-in-out infinite' } },
+    
+    // Extra icons from image
+    { component: GridIcon, className: "w-10 h-10 text-gray-300", style: { top: '80%', left: '20%', animation: 'float 12s ease-in-out infinite' } },
+    { component: LayersIcon, className: "w-12 h-12 text-gray-300", style: { bottom: '70%', right: '30%', animation: 'float-reverse 11s ease-in-out infinite' } },
+    { component: CircleIcon, className: "w-10 h-10 text-red-300", style: { bottom: '10%', left: '40%', animation: 'float 9s ease-in-out infinite' } },
+    { component: EyeIcon, className: "w-10 h-10 text-gray-400", style: { top: '5%', left: '10%', animation: 'float 14s ease-in-out infinite' } },
+    { component: ClockIcon, className: "w-12 h-12 text-gray-300", style: { top: '15%', left: '60%', animation: 'float-reverse 13s ease-in-out infinite' } },
+    { component: PuzzleIcon, className: "w-10 h-10 text-gray-300", style: { top: '25%', right: '25%', animation: 'float 10s ease-in-out infinite' } },
   ];
 
   return (
     <div className="absolute inset-0 z-0">
       {logos.map(({ component: Component, className, style }, index) => (
-        <div key={`${id}-${index}`} className={cn("logo-container absolute opacity-10 transition-opacity duration-300 hover:opacity-30", className)} style={style}>
+        <div key={`${id}-${index}`} className={cn("logo-container absolute opacity-40 transition-opacity duration-300", className)} style={style}>
           <Component />
         </div>
       ))}
@@ -99,18 +99,11 @@ const Helm = (props: SVGProps<SVGSVGElement>) => <svg fill="currentColor" viewBo
 const Aws = (props: SVGProps<SVGSVGElement>) => <svg fill="currentColor" viewBox="0 0 256 256" {...props}><path d="M189.6 156.4c-7.2-2.1-13.6-5.8-19.1-10.8l-1.9-1.7c-5.2-4.9-11.4-8.3-18.2-9.9l-11.3-2.6c-.6 0-1.2-.2-1.6-.6-.4-.4-.7-1-.7-1.6v-1c.1-10.7-3.9-21.1-11.6-29.2-7.7-8.1-18.4-13.3-29.9-14.7-1.1-.1-2.2-.3-3.3-.4h-.3c-11.3-1-22.3 2.1-31.5 8.7-9.3 6.6-16.1 16-19.3 26.8-.6 2.1-1.1 4.2-1.5 6.4-.3 1.9-2 3.3-3.9 3.3H32.4c-2.2 0-4-1.8-4-4v-1.1c0-1.2.9-2.3 2.1-2.6 1.4-.3 2.9-.6 4.3-.8 1.1-.2 2.2-.4 3.3-.7 12-2.7 23.3-9.5 31.6-19.4 8.3-9.9 13.1-22.1 13.4-34.9.1-2.5.3-5 .6-7.5.1-.9.1-1.9.2-2.8.2-1.9.5-3.8.8-5.7.5-2.9 1.3-5.7 2.2-8.5.1-.3.3-.6.5-.8.2-.3.5-.5.9-.6.3-.1.7-.1 1-.1.4 0 .7.1 1 .3.3.2.6.4.8.7.6.9 1.1 1.8 1.5 2.8.5 1.2.9 2.5 1.3 3.8l.2.8.2.8c.2 1 .3 1.9.5 2.9.2.9.4 1.8.6 2.7.7 3.3 1.1 6.6 1.1 10V93c0 2.2-1.8 4-4 4h-1.6c-2.1 0-3.8-1.7-3.9-3.7-.1-1.3-.2-2.5-.4-3.8l-.2-1.1c-.2-.9-.4-1.8-.7-2.7-.4-2-.9-4-1.5-5.9-.6-1.9-1.3-3.7-2.1-5.5-.3-.7-.7-1.3-1.1-1.9-.5-.6-1-1-1.6-1.4-.6-.4-1.3-.7-2-.9-.7-.2-1.4-.3-2.1-.3-1.6 0-3.2.4-4.6 1.1-1.5.7-2.8 1.6-4 2.8-1.2 1.2-2.2 2.5-3 4-1.4 2.8-2.4 5.9-3 9-.7 3.3-1 6.8-1 10.3 0 13.5 4.5 26.4 12.6 36.6 8.1 10.2 19.3 17.1 32.1 19.8 13.5 2.9 27.6.2 39.8-7.5 12.2-7.7 21.6-18.7 26.6-31.5.3-.7.6-1.4.9-2.1.2-.7.4-1.3.6-2 .1-.3.2-.5.3-.8.1-.3.2-.6.3-.9.1-.3.2-.7.3-1.l.1-.3.2-.6.2-.9.1-.3.1-.6.2-.9.1-.3.1-.6.1-.8v-.4c.1-1 .1-2 .1-3v-.5c.3-7.5 3-14.7 7.7-20.9 4.7-6.2 11.2-11.1 18.7-14.2 2-.8 4.1-1.5 6.2-2.1 1-.3 2-.5 3-.7l.5-.1h.3c1-.2 2.1-.3 3.1-.4h.3c.9-.1 1.9-.1 2.8-.1h.3c1 0 2 .1 3 .2l.5.1c1 .1 2 .3 3 .5l.5.1c2 .4 3.9.9 5.8 1.4 1.9.6 3.8 1.2 5.6 2 2 .8 3.9 1.7 5.7 2.7 7.6 4.1 14.1 9.8 18.9 16.6 4.8 6.8 7.6 14.6 7.9 22.8.1 1.6.1 3.2.1 4.8v1.1c0 2.2-1.8 4-4 4h-1.5c-2.1 0-3.8-1.6-4-3.7-.1-1.6-.1-3.2-.1-4.8-.3-7.1-2.6-13.8-6.9-19.4-4.3-5.6-10.3-9.9-17.2-12.4-1.7-.6-3.4-1.2-5.1-1.6-1.8-.5-3.6-.9-5.4-1.2-1.8-.3-3.7-.5-5.5-.6-1.8-.1-3.6-.1-5.4-.1-2.2 0-4.4.1-6.6.4-2.2.3-4.3.7-6.4 1.2-8.5 2.1-16.2 6.5-22.3 12.7-6.1 6.2-10.4 13.9-12.3 22.4-.6 2.5-1 5.1-1.2 7.7-.2 2.6-.2 5.3-.2 8.1 0 2.2-1.8 4-4 4h-2c-2.2 0-4-1.8-4-4v-1.1c.1-3.7.6-7.3 1.5-10.9.9-3.5 2.2-7 3.8-10.3 3-6.1 7.1-11.4 12-15.9 5-4.5 10.6-8 16.9-10.4 6.3-2.4 13-3.6 19.8-3.6h-.4c6.7 0 13.3 1.2 19.5 3.5 6.2 2.3 12 5.7 17.1 9.9 5.1 4.2 9.4 9.2 12.7 14.8 3.3 5.6 5.5 11.6 6.5 17.9.5 3.2.8 6.4.8 9.6v-1.1c0-2.2-1.8-4-4-4h-1.4c-2.2 0-4 1.8-4 4V193c0 2.2 1.8 4 4 4h.6c-2.2 0-4-1.8-4-4v-19.1c0-2.2 1.8-4 4-4h.6c-2.2 0-4-1.8-4-4v-19.1c0-2.2 1.8-4 4-4h.6c-2.2 0-4-1-4-4V95.6c0-2.2 1.8-4 4-4h.6zm132.8-47.5z" /></svg>;
 const Gcp = (props: SVGProps<SVGSVGElement>) => <svg fill="currentColor" viewBox="0 0 24 24" {...props}><path d="M12 15.25a4.25 4.25 0 01-3.64-6.52 4.25 4.25 0 016.52-.39h.01a4.25 4.25 0 01-2.9 6.91z" /><path d="M18.89 12.89A8.51 8.51 0 0115.11 20H8.89v-2.22h6.22a6.29 6.29 0 005.1-9.64L18.89 9.5z" /><path d="M8.89 10.89a6.29 6.29 0 00-4.32 3.84L5.89 16a8.51 8.51 0 013-12h6.22V6.22H8.89a8.51 8.51 0 010 4.67z" /><path d="M8.89 4A8.51 8.51 0 0115.11 8.89h3.78L17.57 7.57a6.29 6.29 0 00-9.64-5.1L6.61 3.79A8.51 8.51 0 018.89 4z" /></svg>;
 const Azure = (props: SVGProps<SVGSVGElement>) => <svg fill="currentColor" viewBox="0 0 24 24" {...props}><path d="M17.48 6.09L9.12 17.65l-4.57-2.34L.45 6.09zM10.15 17.65l5.22-14.86h8.18L10.15 17.65z" /></svg>;
-const DigitalOcean = (props: SVGProps<SVGSVGElement>) => <svg fill="currentColor" viewBox="0 0 24 24" {...props}><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H8v-3h3zm0-4H8v-3h3zm0-4H8V5h3zm4 8h-3v-3h3zm0-4h-3v-3h3z" /></svg>;
-const OracleCloud = (props: SVGProps<SVGSVGElement>) => <svg fill="currentColor" viewBox="0 0 24 24" {...props}><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zM12 6c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z" /></svg>;
-const IbmCloud = (props: SVGProps<SVGSVGElement>) => <svg fill="currentColor" viewBox="0 0 32 32" {...props}><path d="M14 20h2v4h-2zM18 20h2v4h-2zM10 20h2v4h-2zM22 20h2v4h-2zM6 20h2v4H6zM26 20h2v4h-2zM2 14h28v2H2zM2 18h28v2H2zM2 8h28v2H2zM2 12h28v2H2z" /></svg>;
 const Terraform = (props: SVGProps<SVGSVGElement>) => <svg fill="currentColor" viewBox="0 0 24 24" {...props}><path d="M2 2h7.07v7.07H2zm8.59 0h7.07v7.07h-7.07zM2 10.59h7.07v7.07H2zm8.59 0h7.07v7.07h-7.07z" /></svg>;
 const Ansible = (props: SVGProps<SVGSVGElement>) => <svg fill="currentColor" viewBox="0 0 24 24" {...props}><path d="M12 2L1 9l11 7 11-7zM1 10l11 7v6l-11-7z" /></svg>;
-const Chef = (props: SVGProps<SVGSVGElement>) => <svg fill="currentColor" viewBox="0 0 24 24" {...props}><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1.01 15.01c-2.28-.48-4-2.48-4-4.9 0-2.73 2.21-4.96 4.95-5.01h.11c2.75.05 4.95 2.28 4.95 5.01 0 2.42-1.72 4.42-4 4.9v-2.06c1.13-.44 1.95-1.51 1.95-2.84 0-1.65-1.35-3-3-3s-3 1.35-3 3c0 1.33.82 2.4 1.95 2.84v2.06h-.01z" /></svg>;
-const Puppet = (props: SVGProps<SVGSVGElement>) => <svg fill="currentColor" viewBox="0 0 24 24" {...props}><path d="M19 12.9V9l-7-4-7 4v3.8c0 4.8 7 8.2 7 8.2s3.2-1.5 4.9-3.5l-2.8-2.8-1.5 1-4.6-2.6 7-3.9v3.8h2z" /></svg>;
 const Linux = (props: SVGProps<SVGSVGElement>) => <svg fill="currentColor" viewBox="0 0 24 24" {...props}><path d="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2zm-1.5 6a1.5 1.5 0 100 3 1.5 1.5 0 000-3zm3 0a1.5 1.5 0 100 3 1.5 1.5 0 000-3zM9 14s1 2 3 2 3-2 3-2H9z" /></svg>;
 const Ubuntu = (props: SVGProps<SVGSVGElement>) => <svg fill="currentColor" viewBox="0 0 24 24" {...props}><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16zm-3.5-3.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm3.5-7a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm3.5 7a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" /></svg>;
 const RedHat = (props: SVGProps<SVGSVGElement>) => <svg fill="currentColor" viewBox="0 0 24 24" {...props}><path d="M21.5 9.5c-2.4-1.9-5.1-3-8-3-2.9 0-5.6.9-8 2.5l-1.5 5C4 18.5 7.7 22 12 22s8-3.5 8-7.5c0-.1-.1-.3-.1-.4l1.6-4.6zM13 18s-1 1-2 1-2-1-2-1v-4h4v4zm-1-6H8V9c1-.5 2.2-.5 3 0v3z" /></svg>;
-const Suse = (props: SVGProps<SVGSVGElement>) => <svg fill="currentColor" viewBox="0 0 24 24" {...props}><path d="M12.1 2.3l-9 5.2v10.3l9 5.2 9-5.2V7.5zm-1.1 2.6l4.5 2.6-4.5 2.6-4.5-2.6zm-2.2 9l-2.3-1.3v-2.6l4.5 2.6zm2.2 4.1l-4.5-2.6v-2.6l4.5 2.6zm2.3-1.4l4.5-2.6v-2.6l-4.5 2.6zm0-5.2l4.5-2.6-2.2-1.3-4.5 2.6z" /></svg>;
-const Centos = (props: SVGProps<SVGSVGElement>) => <svg fill="currentColor" viewBox="0 0 24 24" {...props}><path d="M12 2l-10 6v8l10 6 10-6V8zm-1.5 3.5l3 1.74v3.52l-3 1.74-3-1.74V7.24zM2 9.76L11 15v5l-9-5.24zM13 20v-5l9-5.24V15zM3.5 8.5L12 13.74 20.5 8.5 12 3.26z" /></svg>;
 const Prometheus = (props: SVGProps<SVGSVGElement>) => <svg fill="currentColor" viewBox="0 0 24 24" {...props}><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-2-9.58V8h4v2.42l-2 2-2-2zM12 16c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z" /></svg>;
 const Grafana = (props: SVGProps<SVGSVGElement>) => <svg fill="currentColor" viewBox="0 0 24 24" {...props}><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15v-4H8l4-5v4h3l-4 5z" /></svg>;
 const Elasticsearch = (props: SVGProps<SVGSVGElement>) => <svg fill="currentColor" viewBox="0 0 24 24" {...props}><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16zM9.5 9.5a2.5 2.5 0 000 5h5a2.5 2.5 0 100-5z" /></svg>;
@@ -127,5 +120,9 @@ const Postgresql = (props: SVGProps<SVGSVGElement>) => <svg fill="currentColor" 
 const Mongodb = (props: SVGProps<SVGSVGElement>) => <svg fill="currentColor" viewBox="0 0 24 24" {...props}><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" /><path d="M12 4c-4.41 0-8 3.59-8 8s3.59 8 8 8c.34 0 .68-.02 1-.06V4.06c-.32-.04-.66-.06-1-.06z" /></svg>;
 const Redis = (props: SVGProps<SVGSVGElement>) => <svg fill="currentColor" viewBox="0 0 24 24" {...props}><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16zm-1-3h2v-5h-2zm0-6h2V4h-2z" /></svg>;
 
-
-      
+const GridIcon = (props: SVGProps<SVGSVGElement>) => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 12h18M12 3v18"/></svg>);
+const LayersIcon = (props: SVGProps<SVGSVGElement>) => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-8.58 3.9a2 2 0 0 1-1.66 0L2.6 17.65"/><path d="m22 12.65-8.58 3.9a2 2 0 0 1-1.66 0L2.6 12.65"/></svg>);
+const CircleIcon = (props: SVGProps<SVGSVGElement>) => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="12" cy="12" r="10"/></svg>);
+const EyeIcon = (props: SVGProps<SVGSVGElement>) => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>);
+const ClockIcon = (props: SVGProps<SVGSVGElement>) => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>);
+const PuzzleIcon = (props: SVGProps<SVGSVGElement>) => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M19.43 12.03c.25.82.25 1.71 0 2.53l-2.4 7.93c-.22.72-.89 1.2-1.65 1.2h-7.9c-.77 0-1.43-.48-1.65-1.2L3.43 14.5c-.25-.82-.25-1.71 0-2.53l2.4-7.93c.22-.72.89-1.2 1.65-1.2h7.9c.77 0 1.43.48 1.65 1.2l2.4 7.93Z"/><path d="M12.03 3.43c.82-.25 1.71-.25 2.53 0l7.93 2.4c.72.22 1.2.89 1.2 1.65v7.9c0 .77-.48 1.43-1.2 1.65l-7.93 2.4c-.82.25-1.71.25-2.53 0l-7.93-2.4c-.72-.22-1.2-.89-1.2-1.65v-7.9c0-.77.48-1.43 1.2-1.65l7.93-2.4Z"/></svg>);
