@@ -203,7 +203,7 @@ export function PreferencesSettings() {
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select a difficulty" />
-                  </Trigger>
+                  </SelectTrigger>
                 </FormControl>
                 <SelectContent>
                   <SelectItem value="Beginner">Beginner</SelectItem>
