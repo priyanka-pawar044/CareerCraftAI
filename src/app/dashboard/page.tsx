@@ -14,8 +14,6 @@ import {
   MessageSquare,
   Target,
   ArrowRight,
-  History,
-  Settings,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -57,22 +55,6 @@ const features = [
     href: '/dashboard/job-matcher',
     color: 'text-emerald-500',
     bgColor: 'bg-emerald-100 dark:bg-emerald-900/20',
-  },
-  {
-    title: 'Interview History',
-    description: 'Review your past mock interviews and feedback.',
-    icon: History,
-    href: '/dashboard/history',
-    color: 'text-pink-500',
-    bgColor: 'bg-pink-100 dark:bg-pink-900/20',
-  },
-  {
-    title: 'Settings',
-    description: 'Manage your profile and account preferences.',
-    icon: Settings,
-    href: '/dashboard/settings',
-    color: 'text-gray-500',
-    bgColor: 'bg-gray-100 dark:bg-gray-900/20',
   },
 ];
 
