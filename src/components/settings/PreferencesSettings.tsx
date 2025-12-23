@@ -19,7 +19,9 @@ import {
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
@@ -28,18 +30,72 @@ import { Loader2 } from 'lucide-react';
 import { initializeFirebase } from '@/firebase';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 
+const jobRoleCategories = {
+  "Software Development": [
+    "Software Engineer",
+    "Full Stack Developer",
+    "Frontend Developer",
+    "Backend Developer",
+    "Web Developer",
+    "Mobile App Developer",
+    "Game Developer",
+  ],
+  "Cloud & DevOps": [
+    "Cloud Engineer",
+    "DevOps Engineer",
+    "Site Reliability Engineer (SRE)",
+    "Platform Engineer",
+    "Kubernetes Engineer",
+    "CI/CD Engineer",
+  ],
+  "Data & AI": [
+    "Data Analyst",
+    "Data Engineer",
+    "Data Scientist",
+    "Machine Learning Engineer",
+    "AI Engineer",
+    "MLOps Engineer",
+  ],
+  "Cybersecurity & Networking": [
+    "Cybersecurity Analyst",
+    "Security Engineer",
+    "Ethical Hacker",
+    "Penetration Tester",
+    "Network Engineer",
+    "Cloud Security Engineer",
+  ],
+  "Testing & QA": [
+    "QA Engineer",
+    "Automation Test Engineer",
+    "Performance Test Engineer",
+    "Manual Tester",
+  ],
+  "IT & Systems": [
+    "System Administrator",
+    "Linux Administrator",
+    "Database Administrator",
+    "IT Support Engineer",
+  ],
+  "UI/UX & Product": [
+    "UI Designer",
+    "UX Designer",
+    "Product Designer",
+    "Technical Product Manager",
+  ],
+  "Emerging Technologies": [
+    "Blockchain Developer",
+    "Web3 Developer",
+    "IoT Engineer",
+    "AR/VR Developer",
+  ],
+};
+
+const allRoles = Object.values(jobRoleCategories).flat();
+
 const preferencesFormSchema = z.object({
   duration: z.coerce.number().int().min(5).max(60),
   difficulty: z.enum(['Beginner', 'Intermediate', 'Advanced']),
-  role: z.enum([
-    'Frontend',
-    'Backend',
-    'Full Stack',
-    'DevOps',
-    'Data Analyst',
-    'Cloud Engineer',
-    'Software Engineer'
-  ]),
+  role: z.enum(allRoles as [string, ...string[]]),
 });
 
 type PreferencesFormValues = z.infer<typeof preferencesFormSchema>;
@@ -118,13 +174,16 @@ export function PreferencesSettings() {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="Software Engineer">Software Engineer</SelectItem>
-                  <SelectItem value="Frontend">Frontend</SelectItem>
-                  <SelectItem value="Backend">Backend</SelectItem>
-                  <SelectItem value="Full Stack">Full Stack</SelectItem>
-                  <SelectItem value="DevOps">DevOps</SelectItem>
-                  <SelectItem value="Data Analyst">Data Analyst</SelectItem>
-                  <SelectItem value="Cloud Engineer">Cloud Engineer</SelectItem>
+                  {Object.entries(jobRoleCategories).map(([category, roles]) => (
+                    <SelectGroup key={category}>
+                      <SelectLabel>{category}</SelectLabel>
+                      {roles.map((role) => (
+                        <SelectItem key={role} value={role}>
+                          {role}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  ))}
                 </SelectContent>
               </Select>
               <FormDescription>
@@ -144,7 +203,7 @@ export function PreferencesSettings() {
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select a difficulty" />
-                  </SelectTrigger>
+                  </Trigger>
                 </FormControl>
                 <SelectContent>
                   <SelectItem value="Beginner">Beginner</SelectItem>

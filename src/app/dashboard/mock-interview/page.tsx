@@ -14,7 +14,9 @@ import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
@@ -52,15 +54,65 @@ type InterviewState =
   | 'evaluating'
   | 'results';
 
-const jobRoles = [
-  'Software Engineer',
-  'Data Analyst',
-  'DevOps',
-  'Cloud Engineer',
-  'Frontend',
-  'Backend',
-  'Full Stack',
-];
+const jobRoleCategories = {
+  "Software Development": [
+    "Software Engineer",
+    "Full Stack Developer",
+    "Frontend Developer",
+    "Backend Developer",
+    "Web Developer",
+    "Mobile App Developer",
+    "Game Developer",
+  ],
+  "Cloud & DevOps": [
+    "Cloud Engineer",
+    "DevOps Engineer",
+    "Site Reliability Engineer (SRE)",
+    "Platform Engineer",
+    "Kubernetes Engineer",
+    "CI/CD Engineer",
+  ],
+  "Data & AI": [
+    "Data Analyst",
+    "Data Engineer",
+    "Data Scientist",
+    "Machine Learning Engineer",
+    "AI Engineer",
+    "MLOps Engineer",
+  ],
+  "Cybersecurity & Networking": [
+    "Cybersecurity Analyst",
+    "Security Engineer",
+    "Ethical Hacker",
+    "Penetration Tester",
+    "Network Engineer",
+    "Cloud Security Engineer",
+  ],
+  "Testing & QA": [
+    "QA Engineer",
+    "Automation Test Engineer",
+    "Performance Test Engineer",
+    "Manual Tester",
+  ],
+  "IT & Systems": [
+    "System Administrator",
+    "Linux Administrator",
+    "Database Administrator",
+    "IT Support Engineer",
+  ],
+  "UI/UX & Product": [
+    "UI Designer",
+    "UX Designer",
+    "Product Designer",
+    "Technical Product Manager",
+  ],
+  "Emerging Technologies": [
+    "Blockchain Developer",
+    "Web3 Developer",
+    "IoT Engineer",
+    "AR/VR Developer",
+  ],
+};
 
 type Evaluation = AiMockInterviewEvaluationOutput & {
   question: string;
@@ -279,13 +331,18 @@ export default function MockInterviewPage() {
             <CardContent>
               <Select onValueChange={setJobRole} value={jobRole}>
                 <SelectTrigger className="w-full md:w-1/2">
-                  <SelectValue placeholder="Select a job role..." />
+                  <SelectValue placeholder="Select the role you are preparing for..." />
                 </SelectTrigger>
                 <SelectContent>
-                  {jobRoles.map((role) => (
-                    <SelectItem key={role} value={role}>
-                      {role}
-                    </SelectItem>
+                  {Object.entries(jobRoleCategories).map(([category, roles]) => (
+                    <SelectGroup key={category}>
+                      <SelectLabel>{category}</SelectLabel>
+                      {roles.map((role) => (
+                        <SelectItem key={role} value={role}>
+                          {role}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
                   ))}
                 </SelectContent>
               </Select>
