@@ -47,7 +47,7 @@ interface InterviewQuestion {
 }
 
 export default function HistoryDetailPage({
-  params,
+  params: { sessionId },
 }: {
   params: { sessionId: string };
 }) {
@@ -55,31 +55,31 @@ export default function HistoryDetailPage({
   const { firestore } = initializeFirebase();
 
   const sessionRef = useMemo(() => {
-    if (!user || !params.sessionId) return null;
+    if (!user || !sessionId) return null;
     return doc(
       firestore,
       'users',
       user.uid,
       'interviewSessions',
-      params.sessionId
+      sessionId
     );
-  }, [user, params, firestore]);
+  }, [user, sessionId, firestore]);
 
   const questionsQuery = useMemo(() => {
-    if (!user || !params.sessionId) return null;
+    if (!user || !sessionId) return null;
     const ref = collection(
       firestore,
       'users',
       user.uid,
       'interviewSessions',
-      params.sessionId,
+      sessionId,
       'interviewQuestions'
     );
     // Note: The 'createdAt' field was not being added in the mock-interview page.
     // Let's order by something that exists, like questionText, for now.
     // A better fix would be to ensure createdAt is always set.
     return query(ref, orderBy('questionText', 'asc'));
-  }, [user, params, firestore]);
+  }, [user, sessionId, firestore]);
 
   const {
     data: session,
