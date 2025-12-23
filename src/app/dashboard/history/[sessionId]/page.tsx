@@ -16,7 +16,7 @@ import {
   type UseCollectionResult,
   type WithId,
 } from '@/firebase/firestore/use-collection';
-import { useMemo } from 'react';
+import { useMemo, use } from 'react';
 import {
   Card,
   CardContent,
@@ -47,10 +47,11 @@ interface InterviewQuestion {
 }
 
 export default function HistoryDetailPage({
-  params: { sessionId },
+  params,
 }: {
   params: { sessionId: string };
 }) {
+  const { sessionId } = use(params);
   const { user } = useAuth();
   const { firestore } = initializeFirebase();
 
@@ -75,9 +76,6 @@ export default function HistoryDetailPage({
       sessionId,
       'interviewQuestions'
     );
-    // Note: The 'createdAt' field was not being added in the mock-interview page.
-    // Let's order by something that exists, like questionText, for now.
-    // A better fix would be to ensure createdAt is always set.
     return query(ref, orderBy('questionText', 'asc'));
   }, [user, sessionId, firestore]);
 
