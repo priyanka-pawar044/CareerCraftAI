@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -67,7 +68,7 @@ type Evaluation = AiMockInterviewEvaluationOutput & {
   answer: string;
 };
 
-const QUESTION_TIME_LIMIT = 120; // 2 minutes in seconds
+const QUESTION_TIME_LIMIT = 300; // 5 minutes in seconds
 
 export default function MockInterviewPage() {
   const { user } = useAuth();
@@ -476,3 +477,5 @@ export default function MockInterviewPage() {
 
   return <div className="max-w-4xl mx-auto">{renderContent()}</div>;
 }
+
+    
