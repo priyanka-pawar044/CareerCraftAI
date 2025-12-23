@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from 'react';
 import {
   Card,
   CardContent,
@@ -8,102 +8,235 @@ import {
   CardHeader,
   CardTitle,
   CardFooter,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { generateRoleBasedInterviewQuestions } from "@/ai/flows/generate-role-based-interview-questions";
-import { aiMockInterviewEvaluation, AiMockInterviewEvaluationOutput } from "@/ai/flows/ai-mock-interview-evaluation";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Loader2, Terminal, ChevronLeft, ChevronRight, CheckCircle, BrainCircuit } from "lucide-react";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { generateRoleBasedInterviewQuestions } from '@/ai/flows/generate-role-based-interview-questions';
+import {
+  aiMockInterviewEvaluation,
+  AiMockInterviewEvaluationOutput,
+} from '@/ai/flows/ai-mock-interview-evaluation';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import {
+  Loader2,
+  Terminal,
+  ChevronLeft,
+  CheckCircle,
+  BrainCircuit,
+  Timer as TimerIcon,
+} from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { useAuth } from '@/context/AuthContext';
+import { initializeFirebase } from '@/firebase';
+import {
+  collection,
+  addDoc,
+  doc,
+  setDoc,
+  serverTimestamp,
+} from 'firebase/firestore';
+import { useRouter } from 'next/navigation';
 
-type InterviewState = "setup" | "generating" | "interviewing" | "evaluating" | "results";
+type InterviewState =
+  | 'setup'
+  | 'generating'
+  | 'interviewing'
+  | 'evaluating'
+  | 'results';
 
-const jobRoles = ["Software Engineer", "Data Analyst", "DevOps", "Cloud Engineer"];
+const jobRoles = [
+  'Software Engineer',
+  'Data Analyst',
+  'DevOps',
+  'Cloud Engineer',
+];
 
-type Evaluation = AiMockInterviewEvaluationOutput & { question: string; answer: string };
+type Evaluation = AiMockInterviewEvaluationOutput & {
+  question: string;
+  answer: string;
+};
+
+const QUESTION_TIME_LIMIT = 120; // 2 minutes in seconds
 
 export default function MockInterviewPage() {
-  const [interviewState, setInterviewState] = useState<InterviewState>("setup");
-  const [jobRole, setJobRole] = useState<string>("");
+  const { user } = useAuth();
+  const { firestore } = initializeFirebase();
+  const router = useRouter();
+
+  const [interviewState, setInterviewState] =
+    useState<InterviewState>('setup');
+  const [jobRole, setJobRole] = useState<string>('');
   const [questions, setQuestions] = useState<string[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [currentAnswer, setCurrentAnswer] = useState("");
+  const [currentAnswer, setCurrentAnswer] = useState('');
   const [evaluations, setEvaluations] = useState<Evaluation[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [interviewSessionId, setInterviewSessionId] = useState<string | null>(
+    null
+  );
 
-  const startInterview = async () => {
-    if (!jobRole) {
-      setError("Please select a job role.");
-      return;
-    }
-    setError(null);
-    setInterviewState("generating");
-    try {
-      const { questions: generatedQuestions } = await generateRoleBasedInterviewQuestions({ jobRole });
-      setQuestions(generatedQuestions);
-      setCurrentQuestionIndex(0);
-      setEvaluations([]);
-      setInterviewState("interviewing");
-    } catch (e) {
-      setError("Failed to generate questions. Please try again.");
-      setInterviewState("setup");
-    }
-  };
-  
-  const submitAnswer = async () => {
+  const [timeLeft, setTimeLeft] = useState(QUESTION_TIME_LIMIT);
+
+  const submitAnswer = useCallback(async () => {
     if (!currentAnswer) {
-      setError("Please provide an answer.");
+      setError('Please provide an answer.');
       return;
     }
+    if (!user || !interviewSessionId) return;
+
     setError(null);
-    setInterviewState("evaluating");
+    setInterviewState('evaluating');
+    setTimeLeft(0); // Stop timer
+
     try {
       const result = await aiMockInterviewEvaluation({
         jobRole,
         question: questions[currentQuestionIndex],
         answer: currentAnswer,
       });
-      setEvaluations([...evaluations, { ...result, question: questions[currentQuestionIndex], answer: currentAnswer }]);
-      setCurrentAnswer("");
+
+      const newEvaluation = {
+        ...result,
+        question: questions[currentQuestionIndex],
+        answer: currentAnswer,
+      };
+
+      // Save question and evaluation to Firestore
+      const questionRef = doc(
+        collection(
+          firestore,
+          'users',
+          user.uid,
+          'interviewSessions',
+          interviewSessionId,
+          'interviewQuestions'
+        )
+      );
+      await setDoc(questionRef, {
+        ...newEvaluation,
+        interviewSessionId: interviewSessionId,
+        questionText: newEvaluation.question,
+        userAnswer: newEvaluation.answer,
+        improvementSuggestions: newEvaluation.suggestions,
+        createdAt: serverTimestamp(),
+      });
+
+      setEvaluations((prev) => [...prev, newEvaluation]);
+      setCurrentAnswer('');
+
       if (currentQuestionIndex < questions.length - 1) {
-        setCurrentQuestionIndex(currentQuestionIndex + 1);
-        setInterviewState("interviewing");
+        setCurrentQuestionIndex((prev) => prev + 1);
+        setInterviewState('interviewing');
+        setTimeLeft(QUESTION_TIME_LIMIT); // Reset timer for next question
       } else {
-        setInterviewState("results");
+        setInterviewState('results');
+        // Update interview session with end time
+        const sessionRef = doc(
+          firestore,
+          'users',
+          user.uid,
+          'interviewSessions',
+          interviewSessionId
+        );
+        await setDoc(
+          sessionRef,
+          { endTime: serverTimestamp() },
+          { merge: true }
+        );
       }
     } catch (e) {
-      setError("Failed to evaluate your answer. Please try again.");
-      setInterviewState("interviewing");
+      setError('Failed to evaluate your answer. Please try again.');
+      setInterviewState('interviewing'); // Allow user to try again
+    }
+  }, [
+    currentAnswer,
+    jobRole,
+    questions,
+    currentQuestionIndex,
+    user,
+    interviewSessionId,
+    firestore,
+  ]);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (interviewState === 'interviewing' && timeLeft > 0) {
+      timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+    } else if (interviewState === 'interviewing' && timeLeft === 0) {
+      submitAnswer();
+    }
+    return () => clearTimeout(timer);
+  }, [timeLeft, interviewState, submitAnswer]);
+
+  const startInterview = async () => {
+    if (!jobRole || !user) {
+      setError('Please select a job role.');
+      return;
+    }
+    setError(null);
+    setInterviewState('generating');
+    try {
+      // Create a new interview session in Firestore
+      const sessionRef = await addDoc(
+        collection(firestore, 'users', user.uid, 'interviewSessions'),
+        {
+          userId: user.uid,
+          jobRole: jobRole,
+          startTime: serverTimestamp(),
+          endTime: null,
+          questionIds: [],
+        }
+      );
+      setInterviewSessionId(sessionRef.id);
+
+      const { questions: generatedQuestions } =
+        await generateRoleBasedInterviewQuestions({ jobRole });
+      setQuestions(generatedQuestions);
+      setCurrentQuestionIndex(0);
+      setEvaluations([]);
+      setInterviewState('interviewing');
+      setTimeLeft(QUESTION_TIME_LIMIT);
+    } catch (e) {
+      setError('Failed to generate questions. Please try again.');
+      setInterviewState('setup');
     }
   };
 
   const restartInterview = () => {
-    setInterviewState("setup");
-    setJobRole("");
+    setInterviewState('setup');
+    setJobRole('');
     setQuestions([]);
     setCurrentQuestionIndex(0);
-    setCurrentAnswer("");
+    setCurrentAnswer('');
     setEvaluations([]);
     setError(null);
-  }
+    setInterviewSessionId(null);
+    setTimeLeft(QUESTION_TIME_LIMIT);
+  };
+
+  const viewHistory = () => {
+    if (interviewSessionId) {
+      router.push(`/dashboard/history/${interviewSessionId}`);
+    }
+  };
 
   const renderContent = () => {
     switch (interviewState) {
-      case "setup":
+      case 'setup':
         return (
           <Card>
             <CardHeader>
               <CardTitle>AI Mock Interview Simulator</CardTitle>
-              <CardDescription>Select a job role to start your practice interview.</CardDescription>
+              <CardDescription>
+                Select a job role to start your practice interview.
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <Select onValueChange={setJobRole} value={jobRole}>
@@ -112,37 +245,64 @@ export default function MockInterviewPage() {
                 </SelectTrigger>
                 <SelectContent>
                   {jobRoles.map((role) => (
-                    <SelectItem key={role} value={role}>{role}</SelectItem>
+                    <SelectItem key={role} value={role}>
+                      {role}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              {error && <p className="text-destructive text-sm mt-2">{error}</p>}
+              {error && (
+                <p className="text-destructive text-sm mt-2">{error}</p>
+              )}
             </CardContent>
             <CardFooter>
-              <Button onClick={startInterview} disabled={!jobRole}>Start Interview</Button>
+              <Button onClick={startInterview} disabled={!jobRole}>
+                Start Interview
+              </Button>
             </CardFooter>
           </Card>
         );
-      
-      case "generating":
+
+      case 'generating':
         return (
           <Card className="flex flex-col items-center justify-center p-8 space-y-4">
-             <Loader2 className="h-12 w-12 animate-spin text-primary" />
-             <p className="text-muted-foreground">Generating your interview questions...</p>
+            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            <p className="text-muted-foreground">
+              Generating your interview questions...
+            </p>
           </Card>
         );
 
-      case "interviewing":
-      case "evaluating":
-        const isEvaluating = interviewState === "evaluating";
-        const progress = ((currentQuestionIndex) / questions.length) * 100;
+      case 'interviewing':
+      case 'evaluating':
+        const isEvaluating = interviewState === 'evaluating';
+        const progress = (currentQuestionIndex / questions.length) * 100;
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        const timerColor =
+          timeLeft <= 30 ? 'text-destructive' : 'text-foreground';
 
         return (
           <Card>
             <CardHeader>
-              <CardTitle>Question {currentQuestionIndex + 1} of {questions.length}</CardTitle>
-              <CardDescription className="font-semibold text-lg text-foreground">{questions[currentQuestionIndex]}</CardDescription>
-               <Progress value={progress} className="mt-4" />
+              <div className="flex justify-between items-start">
+                <div>
+                  <CardTitle>
+                    Question {currentQuestionIndex + 1} of {questions.length}
+                  </CardTitle>
+                  <CardDescription className="font-semibold text-lg text-foreground mt-2">
+                    {questions[currentQuestionIndex]}
+                  </CardDescription>
+                </div>
+                <div
+                  className={`flex items-center gap-2 font-mono text-xl font-semibold ${timerColor}`}
+                >
+                  <TimerIcon className="h-6 w-6" />
+                  {String(minutes).padStart(2, '0')}:
+                  {String(seconds).padStart(2, '0')}
+                </div>
+              </div>
+              <Progress value={progress} className="mt-4" />
             </CardHeader>
             <CardContent>
               <Textarea
@@ -152,72 +312,120 @@ export default function MockInterviewPage() {
                 onChange={(e) => setCurrentAnswer(e.target.value)}
                 disabled={isEvaluating}
               />
-              {error && <p className="text-destructive text-sm mt-2">{error}</p>}
+              {error && (
+                <p className="text-destructive text-sm mt-2">{error}</p>
+              )}
             </CardContent>
             <CardFooter>
-              <Button onClick={submitAnswer} disabled={isEvaluating || !currentAnswer}>
-                {isEvaluating ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Evaluating...</> : "Submit Answer"}
+              <Button
+                onClick={submitAnswer}
+                disabled={isEvaluating || !currentAnswer}
+              >
+                {isEvaluating ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Evaluating...
+                  </>
+                ) : (
+                  'Submit Answer'
+                )}
               </Button>
             </CardFooter>
           </Card>
         );
 
-      case "results":
-        const avgScore = evaluations.reduce((acc, curr) => acc + curr.correctnessScore + curr.clarityScore + curr.confidenceScore, 0) / (evaluations.length * 3);
+      case 'results':
+        const avgScore =
+          evaluations.reduce(
+            (acc, curr) =>
+              acc +
+              curr.correctnessScore +
+              curr.clarityScore +
+              curr.confidenceScore,
+            0
+          ) / (evaluations.length * 3);
         return (
           <div className="space-y-6">
             <Card className="text-center">
               <CardHeader>
-                  <CheckCircle className="mx-auto h-12 w-12 text-green-500" />
-                  <CardTitle>Interview Complete!</CardTitle>
-                  <CardDescription>Your average score was {avgScore.toFixed(0)}/100. Review your feedback below.</CardDescription>
+                <CheckCircle className="mx-auto h-12 w-12 text-green-500" />
+                <CardTitle>Interview Complete!</CardTitle>
+                <CardDescription>
+                  Your average score was {avgScore.toFixed(0)}/100. You can
+                  review your results now or in your history.
+                </CardDescription>
               </CardHeader>
-              <CardFooter className="justify-center">
-                <Button onClick={restartInterview}>
+              <CardFooter className="justify-center gap-4">
+                <Button onClick={restartInterview} variant="outline">
                   <ChevronLeft className="mr-2 h-4 w-4" /> Start New Interview
                 </Button>
+                <Button onClick={viewHistory}>View Full Report</Button>
               </CardFooter>
             </Card>
 
             {evaluations.map((evalItem, index) => (
               <Card key={index}>
                 <CardHeader>
-                  <CardTitle>Question {index + 1}: <span className="font-normal">{evalItem.question}</span></CardTitle>
+                  <CardTitle>
+                    Question {index + 1}:{' '}
+                    <span className="font-normal">{evalItem.question}</span>
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                   <div>
-                      <h3 className="font-semibold">Your Answer</h3>
-                      <p className="text-muted-foreground p-4 bg-muted rounded-md mt-2">{evalItem.answer}</p>
-                   </div>
-                   <div className="grid grid-cols-3 gap-4 text-center">
-                      <div className="p-4 bg-secondary rounded-lg">
-                          <p className="text-sm text-muted-foreground">Correctness</p>
-                          <p className="text-2xl font-bold text-primary">{evalItem.correctnessScore}</p>
-                      </div>
-                      <div className="p-4 bg-secondary rounded-lg">
-                          <p className="text-sm text-muted-foreground">Clarity</p>
-                          <p className="text-2xl font-bold text-primary">{evalItem.clarityScore}</p>
-                      </div>
-                       <div className="p-4 bg-secondary rounded-lg">
-                          <p className="text-sm text-muted-foreground">Confidence</p>
-                          <p className="text-2xl font-bold text-primary">{evalItem.confidenceScore}</p>
-                      </div>
-                   </div>
-                   <div>
-                       <h3 className="font-semibold flex items-center gap-2"><BrainCircuit className="h-5 w-5 text-primary"/> Model Answer</h3>
-                       <p className="text-muted-foreground p-4 border rounded-md mt-2">{evalItem.modelAnswer}</p>
-                   </div>
-                   <div>
-                       <h3 className="font-semibold">Suggestions for Improvement</h3>
-                       <p className="text-muted-foreground p-4 border rounded-md mt-2">{evalItem.suggestions}</p>
-                   </div>
+                  <div>
+                    <h3 className="font-semibold">Your Answer</h3>
+                    <p className="text-muted-foreground p-4 bg-muted rounded-md mt-2">
+                      {evalItem.answer}
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-3 gap-4 text-center">
+                    <div className="p-4 bg-secondary rounded-lg">
+                      <p className="text-sm text-muted-foreground">
+                        Correctness
+                      </p>
+                      <p className="text-2xl font-bold text-primary">
+                        {evalItem.correctnessScore}
+                      </p>
+                    </div>
+                    <div className="p-4 bg-secondary rounded-lg">
+                      <p className="text-sm text-muted-foreground">Clarity</p>
+                      <p className="text-2xl font-bold text-primary">
+                        {evalItem.clarityScore}
+                      </p>
+                    </div>
+                    <div className="p-4 bg-secondary rounded-lg">
+                      <p className="text-sm text-muted-foreground">
+                        Confidence
+                      </p>
+                      <p className="text-2xl font-bold text-primary">
+                        {evalItem.confidenceScore}
+                      </p>
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold flex items-center gap-2">
+                      <BrainCircuit className="h-5 w-5 text-primary" /> Model
+                      Answer
+                    </h3>
+                    <p className="text-muted-foreground p-4 border rounded-md mt-2">
+                      {evalItem.modelAnswer}
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">
+                      Suggestions for Improvement
+                    </h3>
+                    <p className="text-muted-foreground p-4 border rounded-md mt-2">
+                      {evalItem.suggestions}
+                    </p>
+                  </div>
                 </CardContent>
               </Card>
             ))}
           </div>
         );
-      
-      default: return null;
+
+      default:
+        return null;
     }
   };
 

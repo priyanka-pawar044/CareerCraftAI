@@ -19,10 +19,10 @@ import {
   MessageSquare,
   Settings,
   Target,
+  History,
 } from 'lucide-react';
 import { Logo } from '@/components/icons';
 import { useAuth } from '@/context/AuthContext';
-
 
 const navItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -38,6 +38,7 @@ const navItems = [
   },
   { href: '/dashboard/skill-gap', icon: Target, label: 'Skill-Gap Analyzer' },
   { href: '/dashboard/job-matcher', icon: Briefcase, label: 'Job Matcher' },
+  { href: '/dashboard/history', icon: History, label: 'History' },
 ];
 
 export function AppSidebar() {
@@ -66,7 +67,7 @@ export function AppSidebar() {
             <SidebarMenuItem key={item.href}>
               <Link href={item.href}>
                 <SidebarMenuButton
-                  isActive={pathname === item.href}
+                  isActive={pathname.startsWith(item.href) && (item.href !== '/dashboard' || pathname === '/dashboard')}
                   tooltip={item.label}
                 >
                   <item.icon />
@@ -80,12 +81,15 @@ export function AppSidebar() {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-             <Link href="/dashboard/settings">
-                <SidebarMenuButton tooltip="Settings" isActive={pathname === '/dashboard/settings'}>
-                  <Settings />
-                  <span>Settings</span>
-                </SidebarMenuButton>
-              </Link>
+            <Link href="/dashboard/settings">
+              <SidebarMenuButton
+                tooltip="Settings"
+                isActive={pathname === '/dashboard/settings'}
+              >
+                <Settings />
+                <span>Settings</span>
+              </SidebarMenuButton>
+            </Link>
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton tooltip="Logout" onClick={handleLogout}>
