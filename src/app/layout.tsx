@@ -20,13 +20,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning={true}>
+    <html lang="en">
       <body
         className={cn(
           'font-body antialiased',
           'min-h-screen bg-background',
           inter.variable
         )}
+        suppressHydrationWarning={true}
       >
         <AuthProvider>
           {children}
