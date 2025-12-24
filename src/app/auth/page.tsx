@@ -36,6 +36,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { Github } from 'lucide-react';
 import { GoogleIcon } from '@/components/icons/TechLogos';
+import { redirect } from 'next/navigation';
 
 declare global {
   interface Window {
@@ -57,6 +58,9 @@ export default function AuthPage() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
+      if (user) {
+        redirect('/dashboard');
+      }
       if (typeof window !== 'undefined' && !window.recaptchaVerifier) {
         window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
           size: 'invisible',
@@ -161,25 +165,6 @@ export default function AuthPage() {
 
   if (!hasMounted) {
     return null; // or a loading spinner
-  }
-
-  if (user) {
-    return (
-        <div className="flex h-screen w-full items-center justify-center bg-background">
-            <Card className="w-full max-w-md">
-                <CardHeader>
-                    <CardTitle>Welcome!</CardTitle>
-                    <CardDescription>You are logged in as {user.email || user.phoneNumber}.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <p>UID: {user.uid}</p>
-                </CardContent>
-                <CardFooter>
-                    <Button onClick={handleLogout}>Logout</Button>
-                </CardFooter>
-            </Card>
-        </div>
-    )
   }
 
   return (
