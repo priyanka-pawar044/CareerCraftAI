@@ -57,7 +57,7 @@ export default function AuthPage() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
-      if (!window.recaptchaVerifier) {
+      if (typeof window !== 'undefined' && !window.recaptchaVerifier) {
         window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
           size: 'invisible',
           callback: (response: any) => {
@@ -165,7 +165,7 @@ export default function AuthPage() {
 
   if (user) {
     return (
-        <div className="flex h-screen w-full items-center justify-center">
+        <div className="flex h-screen w-full items-center justify-center bg-background">
             <Card className="w-full max-w-md">
                 <CardHeader>
                     <CardTitle>Welcome!</CardTitle>
