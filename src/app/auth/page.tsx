@@ -1,6 +1,7 @@
+
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   getAuth,
   signInWithPopup,
@@ -51,21 +52,24 @@ export default function AuthPage() {
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
   const [user, setUser] = useState<User | null>(null);
+  const [hasMounted, setHasMounted] = useState(false);
 
-  onAuthStateChanged(auth, (user) => {
-    setUser(user);
-  });
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+      if (!window.recaptchaVerifier) {
+        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+          size: 'invisible',
+          callback: (response: any) => {
+            // reCAPTCHA solved, allow signInWithPhoneNumber.
+          },
+        });
+      }
+    });
+    setHasMounted(true);
+    return () => unsubscribe();
+  }, [auth]);
 
-  const setupRecaptcha = () => {
-    if (!window.recaptchaVerifier) {
-      window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-        size: 'invisible',
-        callback: (response: any) => {
-          // reCAPTCHA solved, allow signInWithPhoneNumber.
-        },
-      });
-    }
-  };
 
   const handleGoogleSignIn = async () => {
     const provider = new GoogleAuthProvider();
@@ -122,7 +126,6 @@ export default function AuthPage() {
   };
 
   const handlePhoneSignIn = async () => {
-    setupRecaptcha();
     const appVerifier = window.recaptchaVerifier;
     try {
       const confirmationResult = await signInWithPhoneNumber(auth, phone, appVerifier);
@@ -154,6 +157,10 @@ export default function AuthPage() {
     await signOut(auth);
     setUser(null);
     toast({ title: 'Logged Out', description: 'You have been successfully logged out.' });
+  }
+
+  if (!hasMounted) {
+    return null; // or a loading spinner
   }
 
   if (user) {
